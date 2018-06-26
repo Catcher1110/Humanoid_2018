@@ -23,7 +23,7 @@ class srGeometryInfo
 {
 public:
 
-	enum SHAPETYPE { SPHERE, BOX, CAPSULE, CYLINDER, PLANE, TDS, USER };
+	enum SHAPETYPE { SPHERE, BOX, CAPSULE, CYLINDER, PLANE, TDS, COLLADA, USER };
 
 	/*!
 		Shape type of primitive geometry.

@@ -1,10 +1,5 @@
 FIND_PACKAGE(OpenGL)
 FIND_PACKAGE(GLUT)
-IF ( MSVC )
-  SET(M_LIB)
-ELSE ( MSVC )
-  find_library(M_LIB m)
-ENDIF ( MSVC )
 
 IF ( NOT GLUT_FOUND )
   IF ( MSVC )

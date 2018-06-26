@@ -324,8 +324,17 @@ void SystemGenerator::_SetLinkParam(int idx){
         }
     }
     else{
-        link_[idx]->GetGeomInfo().SetShape(srGeometryInfo::BOX);
-        link_[idx]->GetGeomInfo().SetDimension(Vec3(0.3,0.2,0.1));
+        // TEST
+        link_[idx]->GetGeomInfo().SetShape(srGeometryInfo::COLLADA);
+        link_[idx]->GetGeomInfo().SetFileName(
+                "/Users/donghyunkim/Repository/Humanoid_2018/Simulator/SimulationModel/Mercury_Model/meshes/color_foot_R.dae");
+ 
+        //link_[idx]->GetGeomInfo().SetShape(srGeometryInfo::TDS);
+        //link_[idx]->GetGeomInfo().SetFileName(
+                //"/Users/donghyunkim/Repository/Humanoid_2018/Simulator/SimulationModel/Mercury_Model/Updated_foot.3ds");
+ 
+        //link_[idx]->GetGeomInfo().SetShape(srGeometryInfo::BOX);
+        //link_[idx]->GetGeomInfo().SetDimension(Vec3(0.3,0.2,0.1));
     }
 
     if(Linkidxiter->second->inertial!=0){
