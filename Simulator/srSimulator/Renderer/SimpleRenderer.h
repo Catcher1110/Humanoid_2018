@@ -23,7 +23,7 @@ v0.005 : 2009-01-23			Jeongseok Lee
 #include "srg/srgGeometryDraw.h"
 
 #include "Renderer/Model3DS.h"
-#include "Renderer/ModelCollada.h"
+#include "Renderer/ModelMesh.h"
 
 /*!
   \class srgEntity
@@ -40,15 +40,15 @@ class srgEntity
         virtual void	DynamicRender(void* pVoid) = 0;
 
         Model3DS*		m_Model;
-        ModelCollada*   m_Collada_Model;
+        ModelMesh*   m_Mesh_Model;
 
         srgEntity() {
             m_Model = NULL;
-            m_Collada_Model = NULL;
+            m_Mesh_Model = NULL;
         };
         ~srgEntity() {
             if(m_Model != NULL)  delete m_Model;
-            if(m_Collada_Model != NULL)  delete m_Collada_Model;
+            if(m_Mesh_Model != NULL)  delete m_Mesh_Model;
         };
         Model3DS* Load3DSModel(char* name, SE3 T = SE3(0.0)) {
             m_Model = new Model3DS;
@@ -56,11 +56,12 @@ class srgEntity
             m_Model->Load(name);
             return m_Model;
         };
-        ModelCollada* LoadColladaModel(char* name, SE3 T = SE3(0.0)) {
-            m_Collada_Model = new ModelCollada;
-            T.ToArray(m_Collada_Model->_T);
-            m_Collada_Model->Load(name);
-            return m_Collada_Model;
+        ModelMesh* LoadMeshModel(char* name, Vec3 mesh_scale, SE3 T = SE3(0.0)) {
+            m_Mesh_Model = new ModelMesh;
+            T.ToArray(m_Mesh_Model->_T);
+            m_Mesh_Model->mesh_scale_ = mesh_scale;
+            m_Mesh_Model->Load(name);
+            return m_Mesh_Model;
         };
 
 };

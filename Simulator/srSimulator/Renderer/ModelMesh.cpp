@@ -4,9 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "LieGroup/LieGroup.h"
-#include "Renderer/ModelCollada.h"
+#include "Renderer/ModelMesh.h"
 #include <srConfiguration.h>
-
 
 
 // This is used to generate a warning from the compiler
@@ -25,46 +24,32 @@ using namespace std;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-ModelCollada::ModelCollada()
+ModelMesh::ModelMesh()
 {
     // Initialization
-    ratio_ = 0.01;
     scene_list = 0;
-    // Don't show the normals by default
-    shownormals = false;
 
     // The model is visible by default
     visible = true;
-
-    // Set up the default position
-    pos.x = 0.0f;
-    pos.y = 0.0f;
-    pos.z = 0.0f;
-    // Set up the default rotation
-    rot.x = 0.0f;
-    rot.y = 0.0f;
-    rot.z = 0.0f;
-
-    // Set up the path
-    //path = new char[ PATH_LENGTH ];
 }
 
-ModelCollada::~ModelCollada() {
-    aiReleaseImport(scene);
+ModelMesh::~ModelMesh() {
+    //aiReleaseImport(scene);
 }
 
 
-void ModelCollada::Load(char *name)
+void ModelMesh::Load(char *name)
 {
-    //cout << "Loading Model" << endl;
     scene = aiImportFile(name, aiProcessPreset_TargetRealtime_MaxQuality);
     if(scene){
     }else{ printf("error\n"); }
     Draw();
+    
+    aiReleaseImport(scene);
 }
 
 /* ---------------------------------------------------------------------------- */
-void ModelCollada::color4_to_float4(const aiColor4D *c, float f[4])
+void ModelMesh::color4_to_float4(const aiColor4D *c, float f[4])
 {
     f[0] = c->r;
     f[1] = c->g;
@@ -73,7 +58,7 @@ void ModelCollada::color4_to_float4(const aiColor4D *c, float f[4])
 }
 
 /* ---------------------------------------------------------------------------- */
-void ModelCollada::set_float4(float f[4], float a, float b, float c, float d)
+void ModelMesh::set_float4(float f[4], float a, float b, float c, float d)
 {
     f[0] = a;
     f[1] = b;
@@ -82,7 +67,7 @@ void ModelCollada::set_float4(float f[4], float a, float b, float c, float d)
 }
 
 
-void ModelCollada::apply_material(const struct aiMaterial *mtl)
+void ModelMesh::apply_material(const struct aiMaterial *mtl)
 {
     float c[4];
 
@@ -154,7 +139,7 @@ void ModelCollada::apply_material(const struct aiMaterial *mtl)
 
 
 /* ---------------------------------------------------------------------------- */
-void ModelCollada::recursive_render (const struct aiScene *sc, const struct aiNode* nd)
+void ModelMesh::recursive_render (const struct aiScene *sc, const struct aiNode* nd)
 {
     unsigned int i;
     unsigned int n = 0, t;
@@ -212,7 +197,7 @@ void ModelCollada::recursive_render (const struct aiScene *sc, const struct aiNo
 }
 
 
-void ModelCollada::Draw()
+void ModelMesh::Draw()
 {
     if (visible)
     {
@@ -222,6 +207,8 @@ void ModelCollada::Draw()
         //glLoadIdentity();
 
 
+        std::cout<<mesh_scale_<<std::endl;
+        glScalef(mesh_scale_[0], mesh_scale_[1], mesh_scale_[2]);
         //glScalef(0.001f, 0.001f, 0.001f);
         glEnable(GL_NORMALIZE);
         if(scene_list == 0) {

@@ -1,13 +1,13 @@
 set (headers
 Model3DS.h
-ModelCollada.h
+ModelMesh.h
 SimpleRenderer.h
 SimpleViewer.h
 Texture.h
 )
 set (sources
 Model3DS.cpp
-ModelCollada.cpp
+ModelMesh.cpp
 SimpleRenderer.cpp
 SimpleViewer.cpp
 Texture.cpp

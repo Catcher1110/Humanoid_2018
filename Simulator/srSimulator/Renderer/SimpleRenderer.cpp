@@ -193,8 +193,11 @@ void srSimpleRenderer::_CompileLinkDLs( srgLink* psrgLink )
                 break;
             case srGeometryInfo::USER:
                 break;
-            case srGeometryInfo::COLLADA:
-                psrgLink->LoadColladaModel(psrgLink->m_pLink->GetGeomInfo().GetFileName(), psrgLink->m_pLink->GetGeomInfo().GetLocalFrame());
+            case srGeometryInfo::MESH:
+                psrgLink->LoadMeshModel(
+                        psrgLink->m_pLink->GetGeomInfo().GetFileName(), 
+                        psrgLink->m_pLink->GetGeomInfo().GetMeshScale(),
+                        psrgLink->m_pLink->GetGeomInfo().GetLocalFrame());
                 break;
             case srGeometryInfo::TDS:
                 psrgLink->Load3DSModel(psrgLink->m_pLink->GetGeomInfo().GetFileName(), psrgLink->m_pLink->GetGeomInfo().GetLocalFrame());
@@ -246,8 +249,10 @@ void srSimpleRenderer::_CompileLinkDLs( srgLink* psrgLink )
                 break;
             case srGeometryInfo::USER:
                 break;
-            case srGeometryInfo::COLLADA:
-                psrgLink->LoadColladaModel(psrgLink->m_pLink->GetGeomInfo().GetFileName(), 
+            case srGeometryInfo::MESH:
+                psrgLink->LoadMeshModel(
+                        psrgLink->m_pLink->GetGeomInfo().GetFileName(), 
+                        psrgLink->m_pLink->GetGeomInfo().GetMeshScale(),
                         psrgLink->m_pLink->GetGeomInfo().GetLocalFrame());
                 glDisable(GL_LIGHTING);
                 srgDrawCoordinate_axis_basic(0.2f);
@@ -315,7 +320,7 @@ void srSimpleRenderer::_CompileJointDLs( srgJoint* psrgJoint )
                 break;
             case srGeometryInfo::TDS:
                 break;
-                            case srGeometryInfo::COLLADA:
+                            case srGeometryInfo::MESH:
                 break;
  
             case srGeometryInfo::USER:
@@ -365,7 +370,7 @@ void srSimpleRenderer::_CompileJointDLs( srgJoint* psrgJoint )
             case srGeometryInfo::PLANE:
                 //srgDrawGrid_Flexible(m_pCamera->GetHeightIntoSight());
                 break;
-             case srGeometryInfo::COLLADA:
+             case srGeometryInfo::MESH:
                 break;
            case srGeometryInfo::TDS:
                 break;
@@ -427,7 +432,7 @@ void srSimpleRenderer::_CompileCollisionDLs( srgCollision* psrgCollision )
                 break;
             case srGeometryInfo::TDS:
                 break;
-             case srGeometryInfo::COLLADA:
+             case srGeometryInfo::MESH:
                 break;
             case srGeometryInfo::USER:
                 break;
