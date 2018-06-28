@@ -1,15 +1,14 @@
-#ifndef VALKYRIE_WBC_CENTROID_TASK
-#define VALKYRIE_WBC_CENTROID_TASK
+#ifndef WBDC_CONFIGURATION_TASK_VALKYRIE
+#define WBDC_CONFIGURATION_TASK_VALKYRIE
 
-#include <WBC/Task.hpp>
+#include <Task.hpp>
 
 class Valkyrie_StateProvider;
-class RobotSystem;
 
-class CentroidTask: public Task{
+class ConfigTask: public Task{
 public:
-  CentroidTask(RobotSystem* );
-  virtual ~CentroidTask();
+  ConfigTask();
+  virtual ~ConfigTask();
 
   dynacore::Vector Kp_vec_;
   dynacore::Vector Kd_vec_;
@@ -23,11 +22,9 @@ protected:
   virtual bool _UpdateTaskJacobian();
   // Update JtDotQdot_
   virtual bool _UpdateTaskJDotQdot();
-    // no additional update
-  virtual bool _AdditionalUpdate(){ return true;}
+  virtual bool _AdditionalUpdate(){ return true; }
 
-  const Valkyrie_StateProvider* sp_;
-  const RobotSystem* robot_sys_;
+  Valkyrie_StateProvider* sp_;
 };
 
 #endif

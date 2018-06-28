@@ -12,7 +12,7 @@ target_link_libraries (simulation_valkyrie
   util
   ${OPENGL_LIBRARIES}
   dynacore_urdf
-  #Valkyrie_Controller
+  Valkyrie_Controller
   dynacore_utils
 )
 

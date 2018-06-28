@@ -25,39 +25,48 @@ namespace valkyrie_link{
 }
 
 namespace valkyrie_joint{
-    constexpr int  leftHipYaw = 0;
-    constexpr int  leftHipRoll = 1;
-    constexpr int  leftHipPitch = 2;
-    constexpr int  leftKneePitch = 3;
-    constexpr int  leftAnklePitch = 4;
-    constexpr int  leftAnkleRoll = 5;
+    constexpr int  virtual_X = 0;
+    constexpr int  virtual_Y = 1;
+    constexpr int  virtual_Z = 2;
+    constexpr int  virtual_Rx = 3;
+    constexpr int  virtual_Ry = 4;
+    constexpr int  virtual_Rz = 5;
 
-    constexpr int  rightHipYaw = 6;
-    constexpr int  rightHipRoll = 7;
-    constexpr int  rightHipPitch = 8;
-    constexpr int  rightKneePitch = 9;
-    constexpr int  rightAnklePitch = 10;
-    constexpr int  rightAnkleRoll = 11;
-        
-    constexpr int  torsoYaw = 12;
-    constexpr int  torsoPitch = 13;
-    constexpr int  torsoRoll = 14;
+    constexpr int  leftHipYaw = 6; // 1st joint
+    constexpr int  leftHipRoll = 7;
+    constexpr int  leftHipPitch = 8;
+    constexpr int  leftKneePitch = 9;
+    constexpr int  leftAnklePitch = 10;
+    constexpr int  leftAnkleRoll = 11;
 
-    constexpr int  leftShoulderPitch = 15;
-    constexpr int  leftShoulderRoll = 16;
-    constexpr int  leftShoulderYaw = 17;
-    constexpr int  leftElbowPitch = 18;
-    constexpr int  leftForearmYaw = 19;
+    constexpr int  rightHipYaw = 12;
+    constexpr int  rightHipRoll = 13;
+    constexpr int  rightHipPitch = 14;
+    constexpr int  rightKneePitch = 15;
+    constexpr int  rightAnklePitch = 16;
+    constexpr int  rightAnkleRoll = 17;
 
-    constexpr int  lowerNeckPitch = 20;
-    constexpr int  neckYaw = 21;
-    constexpr int  upperNeckPitch = 22;
+    constexpr int  torsoYaw = 18;
+    constexpr int  torsoPitch = 19;
+    constexpr int  torsoRoll = 20;
 
-    constexpr int  rightShoulderPitch = 23;
-    constexpr int  rightShoulderRoll = 24;
-    constexpr int  rightShoulderYaw = 25;
-    constexpr int  rightElbowPitch = 26;
-    constexpr int  rightForearmYaw = 27;
+    constexpr int  leftShoulderPitch = 21;
+    constexpr int  leftShoulderRoll = 22;
+    constexpr int  leftShoulderYaw = 23;
+    constexpr int  leftElbowPitch = 24;
+    constexpr int  leftForearmYaw = 25;
 
+    constexpr int  lowerNeckPitch = 26;
+    constexpr int  neckYaw = 27;
+    constexpr int  upperNeckPitch = 28;
+
+    constexpr int  rightShoulderPitch = 29;
+    constexpr int  rightShoulderRoll = 30;
+    constexpr int  rightShoulderYaw = 31;
+    constexpr int  rightElbowPitch = 32;
+    constexpr int  rightForearmYaw = 33;
+
+    constexpr int  virtual_Rw = 34;
 }
+
 #endif

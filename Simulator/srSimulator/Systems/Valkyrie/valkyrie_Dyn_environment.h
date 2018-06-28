@@ -4,11 +4,8 @@
 #include "LieGroup/LieGroup.h"
 #include <vector>
 #include <Utils/wrap_eigen.hpp>
-
-//TEST JUNHYEOK
 #include "new_valkyrie.h"
 
-//TEST
 ////////////////////////////////////////////////
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -22,21 +19,10 @@
 
 
 class interface;
+class Valkyrie_Command;
+class Valkyrie_SensorData;
 class srSpace;
 class Ground;
-class SR_Valkyrie;
-class sr3DImportSystem;
-
-
-struct state
-{
-  std::vector<double> conf;
-  std::vector<double> jvel;
-  std::vector<double> torque   ;
-  // std::vector<double> euler_ang;
-  double ori_mtx[9];
-  std::vector<double> ang_vel;
-};
 
 class Valkyrie_Dyn_environment
 {
@@ -50,6 +36,9 @@ public:
   void SetCurrentState_All();
   void saveLandingLocation();
 public:
+  Valkyrie_SensorData* data_;
+  Valkyrie_Command* cmd_;
+
   interface* interface_;
   New_Valkyrie* new_robot_;
 
@@ -58,13 +47,6 @@ public:
 
   double ori_mtx_[9];
   std::vector<double> ang_vel_  ;
-
-  std::vector<state> history_state_;
-  std::vector<dynacore::Vect3> contact_pt_list_;
-  std::vector<dynacore::Vect3> contact_force_list_;
-
-  std::vector<dynacore::Vect3> indicated_contact_pt_list_;
-  std::vector<dynacore::Vect3> commanded_contact_force_list_;
 
 protected:
   double slope_;

@@ -345,7 +345,9 @@ int ModelMesh::LoadGLTextures(const aiScene* scene)
         }
         else
         {
-            printf("error during texture reading: %s\n", filename.c_str());
+            if(filename != ".png"){
+                printf("error during texture reading: %s\n", filename.c_str());
+            }
             /* Error occurred */
             //MessageBox(NULL, ("Couldn't load Image: " + fileloc).c_str() , "ERROR", MB_OK | MB_ICONEXCLAMATION);
         }

@@ -2,7 +2,6 @@
 #include "common/utils.h"
 #include <Utils/wrap_eigen.hpp>
 #include <Utils/utilities.hpp>
-#include <DynaController/Mercury_Controller/Mercury_StateProvider.hpp>
 #include <ParamHandler/ParamHandler.hpp>
 #include "LED_Position_Announcer.hpp"
 // #define SENSOR_NOISE

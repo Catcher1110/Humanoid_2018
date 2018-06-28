@@ -302,11 +302,8 @@ void SystemGenerator::_SetLinkParam(int idx){
                 = boost::dynamic_pointer_cast<dynacore::urdf::Mesh>(
                         Linkidxiter->second->visual_array[0]->geometry );
 
-            //std::cout<<mesh->scale.x<<std::endl;
-            //std::cout<<mesh->scale.y<<std::endl;
-            //std::cout<<mesh->scale.z<<std::endl;
             string ModelFileName_ = file_path_ + mesh->filename;
-             std::cout << ModelFileName_ << std::endl;
+             //std::cout << ModelFileName_ << std::endl;
             const char* modelnamepath = ModelFileName_.c_str();
             link_[idx]->GetGeomInfo().SetMeshScale(mesh->scale.x, 
                     mesh->scale.y, 
