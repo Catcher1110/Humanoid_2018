@@ -35,9 +35,7 @@ void SystemGenerator::BuildRobot(Vec3 location,
 
 void SystemGenerator::_AssembleModel(Vec3 location, srSystem::BASELINKTYPE base_link_type, srJoint::ACTTYPE joint_type){
     _SetBase(location, base_link_type);
-    //std::cout << "set base" << std::endl;
     _SetPassiveJoint(joint_type);
-    //std::cout << "set passive joint" << std::endl;
     _SetLinkJoint();
 }
 
@@ -288,7 +286,9 @@ void SystemGenerator::_SetLinkParam(int idx){
         Inertiaoffset_=Vec3(Linkidxiter->second->inertial->origin.position.x,Linkidxiter->second->inertial->origin.position.y,Linkidxiter->second->inertial->origin.position.z);
     }
     
+    //TEST
     if(Linkidxiter->second->visual!=0){
+    //if(false){
         link_visual_xyz[0]=Linkidxiter->second->visual->origin.position.x;
         link_visual_xyz[1]=Linkidxiter->second->visual->origin.position.y;
         link_visual_xyz[2]=Linkidxiter->second->visual->origin.position.z;
@@ -312,6 +312,13 @@ void SystemGenerator::_SetLinkParam(int idx){
                     mesh->scale.y, 
                     mesh->scale.z);
             link_[idx]->GetGeomInfo().SetShape(srGeometryInfo::MESH);
+
+            std::stringstream ss(mesh->filename);
+            string extension;
+            getline(ss, extension, '.');
+            getline(ss, extension, '.');
+            if(extension == "3ds")
+                link_[idx]->GetGeomInfo().SetShape(srGeometryInfo::TDS);
             link_[idx]->GetGeomInfo().SetFileName(modelnamepath);
         }
 

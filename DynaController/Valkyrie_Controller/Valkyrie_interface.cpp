@@ -19,7 +19,7 @@ Valkyrie_interface::Valkyrie_interface():interface(), gamma_(valkyrie::num_act_j
 Valkyrie_interface::~Valkyrie_interface(){
 }
 
-void Valkyrie_interface::GetCommand(void* sensor_data, std::vector<double> & command){
+void Valkyrie_interface::GetCommand(void* sensor_data, void* command){
     Valkyrie_SensorData* data = ((Valkyrie_SensorData*) sensor_data);
     for(int i(0); i<valkyrie::num_qdot; ++i) {
         sp_->q_[i] = data->q[i];

@@ -19,7 +19,7 @@ class Valkyrie_interface : public interface{
         Valkyrie_interface();
         virtual ~Valkyrie_interface();
 
-        virtual void GetCommand(void* sensor_data, std::vector<double> & command);
+        virtual void GetCommand(void* sensor_data, void* command);
 
     protected:
         Valkyrie_StateProvider* sp_;

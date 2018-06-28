@@ -5,11 +5,9 @@
 
 #include "common/utils.h"
 
-#include <ControlSystem/Valkyrie/Valkyrie_Controller/interface.hpp>
-#include <ControlSystem/Valkyrie/Valkyrie_Controller/StateProvider.hpp>
+#include <DynaController/Valkyrie_Controller/Valkyrie_interface.hpp>
+#include <DynaController/Valkyrie_Controller/Valkyrie_StateProvider.hpp>
 #include <srTerrain/Ground.h>
-#include <srTerrain/srRoom.h>
-#include <srTerrain/srBoxObstacle.h>
 
 #ifdef Measure_Time
 #include <chrono>
@@ -31,28 +29,25 @@ Valkyrie_Dyn_environment::Valkyrie_Dyn_environment():
     /********** Space Setup **********/
     m_Space = new srSpace();
     m_ground = new Ground();
-    m_room = new srRoom(Vec3(0., 0., 0.));
-    m_box = new srBoxObstacle(Vect3(0.7, 0.4, 1.3),Vect3(box_size,box_size,box_size));
-    m_box2 = new srBoxObstacle(Vect3(0.6, -0.4, 1.3), Vect3(box_size,box_size,box_size));
 
     m_Space->AddSystem(m_ground->BuildGround());
-    //m_Space->AddSystem((srSystem*)m_room);
-    m_Space->AddSystem((srSystem*)m_box);
-    m_Space->AddSystem((srSystem*)m_box2);
 
     /********** Robot Set  **********/
     new_robot_ = new New_Valkyrie();
-    new_robot_->BuildRobot(Vec3 (0., 0., 0.), srSystem::FIXED, srJoint::TORQUE, "urdf/r5_urdf_rbdl.urdf");
+     //new_robot_->BuildRobot(Vec3 (0., 0., 0.), srSystem::FIXED, 
+            //srJoint::TORQUE, ModelPath"Valkyrie_Model/r5_urdf.urdf");
+    new_robot_->BuildRobot(Vec3 (0., 0., 0.), srSystem::FIXED, 
+            srJoint::TORQUE, ModelPath"Valkyrie/valkyrie_no_collision.urdf");
     m_Space->AddSystem((srSystem*)new_robot_);
 
     /******** Interface set ********/
-    interface_ = new interface();
+    //interface_ = new Valkyrie_interface();
     contact_pt_list_.clear();
     contact_force_list_.clear();
 
     m_Space->DYN_MODE_PRESTEP();
     m_Space->SET_USER_CONTROL_FUNCTION_2(ControlFunction);
-    m_Space->SetTimestep(SERVO_RATE);
+    m_Space->SetTimestep(valkyrie::servo_rate);
     m_Space->SetGravity(0.0,0.0,-9.81);
 
     m_Space->SetNumberofSubstepForRendering(1);
@@ -67,14 +62,14 @@ void Valkyrie_Dyn_environment::ControlFunction( void* _data ) {
   Valkyrie_Dyn_environment* pDyn_env = (Valkyrie_Dyn_environment*)_data;
   New_Valkyrie* robot = (New_Valkyrie*)(pDyn_env->new_robot_);
 
-  double alternate_time = SIM_SERVO_RATE * count;
+  double alternate_time = valkyrie::servo_rate * count;
   std::vector<double> jpos(robot->num_act_joint_);
   std::vector<double> jvel(robot->num_act_joint_);
   std::vector<double> jtorque(robot->num_act_joint_);
-  sejong::Vect3 pos;
-  sejong::Quaternion rot;
-  sejong::Vect3 body_vel;
-  sejong::Vect3 ang_vel;
+  dynacore::Vect3 pos;
+  dynacore::Quaternion rot;
+  dynacore::Vect3 body_vel;
+  dynacore::Vect3 ang_vel;
   std::vector<double> torque_command(robot->num_act_joint_);
 
   for(int i(0); i<robot->num_act_joint_; ++i){
@@ -91,7 +86,7 @@ void Valkyrie_Dyn_environment::ControlFunction( void* _data ) {
     ang_vel[i] = robot->link_[robot->link_idx_map_.find("pelvis")->second]->GetVel()[i];
   }
   pDyn_env->_Get_Orientation(rot);
-  pDyn_env->interface_->GetCommand(alternate_time, jpos, jvel, jtorque, pos, rot, body_vel, ang_vel, torque_command);
+  //pDyn_env->interface_->GetCommand(alternate_time, jpos, jvel, jtorque, pos, rot, body_vel, ang_vel, torque_command);
 
   for(int i(0); i<3; ++i){
     robot->vp_joint_[i]->m_State.m_rCommand = 0.0;
@@ -103,7 +98,7 @@ void Valkyrie_Dyn_environment::ControlFunction( void* _data ) {
   }
   // pDyn_env->_ExternalDisturbance(count);
   pDyn_env->_ListReactionForce();
-  pDyn_env->_ListCommandedReactionForce(StateProvider::GetStateProvider()->Fr_);
+  pDyn_env->_ListCommandedReactionForce(Valkyrie_StateProvider::getStateProvider()->Fr_);
   pDyn_env->_SaveStanceFoot();
 }
 
@@ -128,19 +123,19 @@ void Valkyrie_Dyn_environment::_ExternalDisturbance(int count){
 
 void Valkyrie_Dyn_environment::_SaveStanceFoot(){
     Vec3 foot_pos;
-    if(StateProvider::GetStateProvider()->stance_foot_ == LK_rightFoot ||
-            StateProvider::GetStateProvider()->stance_foot_ == LK_rightCOP_Frame){
+    if(Valkyrie_StateProvider::getStateProvider()->stance_foot_ == valkyrie_link::rightFoot ||
+            Valkyrie_StateProvider::getStateProvider()->stance_foot_ == valkyrie_link::rightCOP_Frame){
         foot_pos = new_robot_->link_[new_robot_->link_idx_map_.find("rightCOP_Frame")->second]->GetPosition();
     } else{
         foot_pos = new_robot_->link_[new_robot_->link_idx_map_.find("leftCOP_Frame")->second]->GetPosition();
     }
-    StateProvider::GetStateProvider()->global_stance_foot_pos_<<foot_pos[0], foot_pos[1], foot_pos[2];
+    Valkyrie_StateProvider::getStateProvider()->global_stance_foot_pos_<<foot_pos[0], foot_pos[1], foot_pos[2];
 }
 
 
-void Valkyrie_Dyn_environment::_ListCommandedReactionForce(const sejong::Vector & Fr){
-    sejong::Vect3 vec3_fr;
-    sejong::Vect3 vec3_cp;
+void Valkyrie_Dyn_environment::_ListCommandedReactionForce(const dynacore::Vector & Fr){
+    dynacore::Vect3 vec3_fr;
+    dynacore::Vect3 vec3_cp;
     Vec3 contact_point;
     for (int i(0); i<8; ++i){
         if(i < 4){ //Left
@@ -170,8 +165,8 @@ void Valkyrie_Dyn_environment::_ListReactionForce(){
         // if (contact_pt->bActive && (Norm(contact_pt->globalpoint) > 0) ){
         if (cc_array->nContactPts > 0 ){
             // Left: Ground, Right: Link
-            sejong::Vect3 contact_point_loc;
-            sejong::Vect3 contact_force;
+            dynacore::Vect3 contact_point_loc;
+            dynacore::Vect3 contact_force;
 
             dse3 impulse(0.0);
             for (int k(0); k < 3; ++k){
@@ -200,128 +195,9 @@ void Valkyrie_Dyn_environment::_ListReactionForce(){
         //_Draw_Contact_Point();
         // _Draw_Contact_Force();
         _Draw_Commanded_Force();
-        _Draw_Path();
-        _Draw_FootPlacement();
-        //_Draw_StatEqConvexHull_Point();
-        //_Draw_CoM3DAcc_Point();
-        //_Draw_CoMAcc();
-        //_Draw_CoM();
-    }
-    void Valkyrie_Dyn_environment::_Draw_Path(){
-        StateProvider* sp = StateProvider::GetStateProvider();
-        if (sp->path_.size() >1 ){
-            for (int j(0); j< sp->path_.size()-1; ++j){
-                glLineWidth(3.0);
-                glColor4f(0.01f, 0.01f, 0.7f, 0.6f);
-                glBegin(GL_LINES);
-                glVertex3f(sp->path_[j][0],  sp->path_[j][1], sp->path_[j][2]);
-                glVertex3f(sp->path_[j+1][0], sp->path_[j+1][1], sp->path_[j+1][2]);
-                glEnd();
-            }
-        }
+        //_Draw_FootPlacement();
     }
 
-    void Valkyrie_Dyn_environment::_Draw_CoMAcc() {
-        StateProvider* sp = StateProvider::GetStateProvider();
-        if (sp->CoM_acc.size()) {
-            glLineWidth(5.0);
-            glColor4f(1.f, 1.f, 0.f, 2.f);
-            glBegin(GL_LINES);
-            glVertex3f(sp->CoM_pos_[0], sp->CoM_pos_[1], sp->CoM_pos_[2]);
-            glVertex3f(sp->CoM_pos_[0] + sp->CoM_acc[0], sp->CoM_pos_[1] + sp->CoM_acc[1], sp->CoM_pos_[2] + sp->CoM_acc[2]);
-            glEnd();
-        }
-    }
-
-    void Valkyrie_Dyn_environment::_Draw_CoM(){
-
-        StateProvider* sp = StateProvider::GetStateProvider();
-        float radius = 0.02f;
-        int numSlices = 40;
-        int numStacks = 5;
-        glColor3f(0.f, 0.f, 1.f);
-
-        glVertex3f(sp->CoM_pos_[0], sp->CoM_pos_[1], sp->CoM_pos_[2]);
-        glTranslatef(sp->CoM_pos_[0],
-        sp->CoM_pos_[1],
-        sp->CoM_pos_[2]);
-
-        GLUquadricObj* pQuadric = gluNewQuadric();
-        assert(pQuadric!=NULL);
-        gluSphere(pQuadric,radius,numSlices,numStacks);
-        glEnd();
-
-    }
-
-void Valkyrie_Dyn_environment::_Draw_CoM3DAcc_Point() {
-         StateProvider* sp = StateProvider::GetStateProvider();
-
-        if (sp->comacc_convex_hull.size()) {
-            glBegin(GL_POLYGON);
-            glDisable(GL_CULL_FACE);
-            glLineWidth(3.0);
-            glColor4f(1.0f, 0.f, 0.0f, 0.2f);
-            glVertex3f(sp->CoM_pos_[0], sp->CoM_pos_[1], 0);
-            for (int j(0); j< sp->comacc_convex_hull.size(); ++j){
-                glLineWidth(3.0);
-                glColor4f(1.0f, 0.f, 0.0f, 0.2f);
-                glVertex3f(sp->comacc_convex_hull[j][0],  sp->comacc_convex_hull[j][1], sp->comacc_convex_hull[j][2]);
-            }
-            glEnd();
-
-            glBegin(GL_POLYGON);
-            glDisable(GL_CULL_FACE);
-            glLineWidth(3.0);
-            glColor4f(1.0f, 0.f, 0.0f, 0.2f);
-            glVertex3f(sp->CoM_pos_[0], sp->CoM_pos_[1], 0);
-            for (int j(sp->comacc_convex_hull.size()-1); j >= 0; --j){
-                glLineWidth(3.0);
-                glColor4f(1.0f, 0.f, 0.0f, 0.22f);
-                glVertex3f(sp->comacc_convex_hull[j][0],  sp->comacc_convex_hull[j][1], sp->comacc_convex_hull[j][2]);
-            }
-            glEnd();
-        }
-        sp->comacc_convex_hull.clear();
-}
-
-    void Valkyrie_Dyn_environment::_Draw_StatEqConvexHull_Point(){
-        StateProvider* sp = StateProvider::GetStateProvider();
-
-        if (sp->stat_eq_convex_hull.size()) {
-            glBegin(GL_POLYGON);
-            glDisable(GL_CULL_FACE);
-            for (int j(0); j< sp->stat_eq_convex_hull.size(); ++j){
-                glLineWidth(3.0);
-                glColor4f(0.0f, 1.f, 0.0f, 0.5f);
-                glVertex3f(sp->stat_eq_convex_hull[j][0],  sp->stat_eq_convex_hull[j][1], sp->stat_eq_convex_hull[j][2]);
-            }
-            glEnd();
-
-            glBegin(GL_POLYGON);
-            glDisable(GL_CULL_FACE);
-            for (int j(sp->stat_eq_convex_hull.size()-1); j >= 0; --j){
-                glLineWidth(3.0);
-                glColor4f(0.0f, 1.f, 0.0f, 0.5f);
-                glVertex3f(sp->stat_eq_convex_hull[j][0],  sp->stat_eq_convex_hull[j][1], sp->stat_eq_convex_hull[j][2]);
-            }
-            glEnd();
-        }
-        sp->stat_eq_convex_hull.clear();
-    }
-
-    void Valkyrie_Dyn_environment::_Draw_FootPlacement(){
-        StateProvider* sp = StateProvider::GetStateProvider();
-        if (sp->foot_placement_list_.size() >1 ){
-            for (int j(0); j< sp->foot_placement_list_.size()-1; ++j){
-                glColor4f(0.01f, 0.9f, 0.0f, 0.6f);
-                glBegin(GL_LINES);
-                _DrawHollowCircle(sp->foot_placement_list_[j][0],
-                        sp->foot_placement_list_[j][1],
-                        sp->foot_placement_list_[j][2],
-                        0.02f);
-            }
-        }
-    }
 
     void Valkyrie_Dyn_environment::_DrawHollowCircle(GLfloat x, GLfloat y, GLfloat z, GLfloat radius){
         int i;
@@ -345,7 +221,7 @@ void Valkyrie_Dyn_environment::_Draw_CoM3DAcc_Point() {
         double radi(0.02);
 
         double theta(0.0);
-        sejong::Vect3 contact_loc;
+        dynacore::Vect3 contact_loc;
         for (int j(0); j<contact_pt_list_.size(); ++j){
             contact_loc = contact_pt_list_[j];
             glBegin(GL_LINE_LOOP);
@@ -360,8 +236,8 @@ void Valkyrie_Dyn_environment::_Draw_CoM3DAcc_Point() {
     }
 
     void Valkyrie_Dyn_environment::_Draw_Contact_Force(){
-        sejong::Vect3 contact_loc;
-        sejong::Vect3 contact_force;
+        dynacore::Vect3 contact_loc;
+        dynacore::Vect3 contact_force;
         double reduce_ratio(1.0);
 
         // GLfloat LineRange[2];
@@ -387,8 +263,8 @@ void Valkyrie_Dyn_environment::_Draw_CoM3DAcc_Point() {
     }
 
     void Valkyrie_Dyn_environment::_Draw_Commanded_Force(){
-        sejong::Vect3 contact_loc;
-        sejong::Vect3 contact_force;
+        dynacore::Vect3 contact_loc;
+        dynacore::Vect3 contact_force;
         double reduce_ratio(0.001);
 
         for (int j(0); j<indicated_contact_pt_list_.size(); ++j){
@@ -452,7 +328,7 @@ void Valkyrie_Dyn_environment::_Draw_CoM3DAcc_Point() {
         }
     }
 
-    void Valkyrie_Dyn_environment::_Get_Orientation(sejong::Quaternion & rot){
+    void Valkyrie_Dyn_environment::_Get_Orientation(dynacore::Quaternion & rot){
         SO3 so3_body =  new_robot_->link_[new_robot_->link_idx_map_.find("pelvis")->second]->GetOrientation();
 
         Eigen::Matrix3d ori_mtx;
@@ -461,7 +337,7 @@ void Valkyrie_Dyn_environment::_Draw_CoM3DAcc_Point() {
             ori_mtx(i, 1) = so3_body[3+i];
             ori_mtx(i, 2) = so3_body[6+i];
         }
-        sejong::Quaternion ori_quat(ori_mtx);
+        dynacore::Quaternion ori_quat(ori_mtx);
         rot = ori_quat;
     }
 
@@ -480,7 +356,7 @@ void Valkyrie_Dyn_environment::_Draw_CoM3DAcc_Point() {
     }
 
     void Valkyrie_Dyn_environment::_CheckFootContact(){
-        StateProvider::GetStateProvider()->b_both_contact_ = false;
+        //Valkyrie_StateProvider::getStateProvider()->b_both_contact_ = false;
 
         // Vec3 lfoot_pos = new_robot_->link_[new_robot_->link_idx_map_.find("leftCOP_Frame")->second]->GetPosition();
         // Vec3 rfoot_pos = new_robot_->link_[new_robot_->link_idx_map_.find("rightCOP_Frame")->second]->GetPosition();
@@ -504,8 +380,8 @@ void Valkyrie_Dyn_environment::_Draw_CoM3DAcc_Point() {
         //   std::cout<<rfoot_pos;
         //   printf("right height: %f\n", rheight);
 
-        //   StateProvider::GetStateProvider()->b_both_contact_ = true;
+        //   Valkyrie_StateProvider::getStateProvider()->b_both_contact_ = true;
         // } else {
-        //   StateProvider::GetStateProvider()->b_both_contact_ = false;
+        //   Valkyrie_StateProvider::getStateProvider()->b_both_contact_ = false;
         // }
     }

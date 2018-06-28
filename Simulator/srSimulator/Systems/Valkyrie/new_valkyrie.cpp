@@ -3,6 +3,9 @@
 New_Valkyrie::New_Valkyrie():
   SystemGenerator()
 {
+      //BuildRobot(Vec3(0., 0., 0.), srSystem::FIXED, srJoint::TORQUE,
+          //ModelPath"Valkyrie/valkyrie.urdf");
+ 
   printf("[Valkyrie] ASSEMBLED\n");
 }
 

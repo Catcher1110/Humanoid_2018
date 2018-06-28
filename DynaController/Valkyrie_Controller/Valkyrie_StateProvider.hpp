@@ -14,6 +14,9 @@ class Valkyrie_StateProvider{
             return & sp;
         }
 
+        int stance_foot_;
+        dynacore::Vect3 global_stance_foot_pos_;
+        dynacore::Vector Fr_;
     private:
         Valkyrie_StateProvider():q_(valkyrie::num_q), qdot_(valkyrie::num_qdot){}
 };

@@ -20,6 +20,8 @@ namespace valkyrie_link{
     constexpr int rightPalm = 4;
     constexpr int leftPalm = 5;
     constexpr int head = 6;
+    constexpr int rightFoot = 7;
+    constexpr int leftFoot = 8;
 }
 
 namespace valkyrie_joint{

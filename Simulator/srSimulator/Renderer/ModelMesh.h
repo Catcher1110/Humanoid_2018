@@ -12,16 +12,25 @@
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
+#include <map>
+#include "Renderer/Texture.h"
 
 class ModelMesh  
 {
     private:
+        std::string file_path_;
         void set_float4(float f[4], float a, float b, float c, float d);
         void color4_to_float4(const aiColor4D *c, float f[4]);
+        void Color4f(const aiColor4D *color);
         void apply_material(const struct aiMaterial *mtl);
         void recursive_render (const struct aiScene *sc, const struct aiNode* nd);
+        int LoadGLTextures(const aiScene* scene);
         const struct aiScene* scene;
+        bool loadPngImage(const char *name, int &outWidth, int &outHeight, bool &outHasAlpha, GLubyte **outData);
+
+        std::map<std::string, GLuint*> textureIdMap;	// map image filenames to textureIds
+        GLuint*		textureIds;							// pointer to texture Array
+
 
         GLuint scene_list;
    
