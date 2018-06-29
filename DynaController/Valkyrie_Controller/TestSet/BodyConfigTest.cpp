@@ -9,7 +9,8 @@
 #include <Valkyrie/Valkyrie_Model.hpp>
 
 BodyConfigTest::BodyConfigTest(RobotSystem* robot):Test(robot){
-  phase_ = BodyConfigPhase::BCJPOS_initial_jpos;
+  //phase_ = BodyConfigPhase::BCJPOS_initial_jpos;
+  phase_ = BodyConfigPhase::BCJPOS_body_ctrl;
   state_list_.clear();
 
   jpos_ctrl_ = new JPosTargetCtrl(robot);

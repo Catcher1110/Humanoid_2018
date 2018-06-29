@@ -17,7 +17,7 @@ protected:
   virtual bool _UpdateUf();
   virtual bool _UpdateInequalityVector();
 
-  void _setU(double mu, dynacore::Matrix & U);
+  void _setU(double x, double y, double mu, dynacore::Matrix & U);
 
   const RobotSystem* robot_sys_;
   Valkyrie_StateProvider* sp_;

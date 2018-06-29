@@ -247,7 +247,8 @@ void JPosTrajPlanningCtrl::_CheckPlanning(){
         // TEST
         // target_loc[0] = sp_->Q_[0] + body_pt_offset_[0];
 
-        inv_kin_.getLegConfigAtVerticalPosture(swing_foot_, target_loc, guess_q, config_sol);
+        inv_kin_.getLegConfigAtVerticalPosture(
+                swing_foot_, target_loc, guess_q, config_sol);
         target_swing_leg_config_ = config_sol.segment(swing_leg_jidx_, 3);
 
         _SetJPosBspline(mid_swing_leg_config_, target_swing_leg_config_,

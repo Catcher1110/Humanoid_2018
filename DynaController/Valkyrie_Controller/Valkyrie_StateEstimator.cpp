@@ -98,7 +98,7 @@ void Valkyrie_StateEstimator::Update(Valkyrie_SensorData* data){
     body_ori.w() = 1.; body_ori.x() = 0.; body_ori.y() = 0.; body_ori.z() = 0;
     dynacore::Vect3 body_ang_vel;
 
-    ori_est_->EstimatorInitialization(body_ori, imu_acc, imu_ang_vel);   
+    ori_est_->setSensorData( imu_acc, imu_ang_vel);
     ori_est_->getEstimatedState(body_ori, body_ang_vel);
 
     curr_config_[3] = body_ori.x();
@@ -126,6 +126,8 @@ void Valkyrie_StateEstimator::Update(Valkyrie_SensorData* data){
 
     sp_->Q_ = curr_config_;
     sp_->Qdot_ = curr_qdot_;
+
+    //dynacore::pretty_print(sp_->Q_, std::cout, "state estimator config");
 
     // Right Contact 
     if(data->rfoot_contact) sp_->b_rfoot_contact_ = 1;

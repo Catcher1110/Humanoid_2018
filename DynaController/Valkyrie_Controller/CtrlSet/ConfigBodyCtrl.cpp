@@ -118,6 +118,7 @@ void ConfigBodyCtrl::FirstVisit(){
     jpos_ini_ = sp_->Q_.segment(valkyrie::num_virtual, valkyrie::num_act_joint);
     ctrl_start_time_ = sp_->curr_time_;
     ini_body_height_ = sp_->Q_[valkyrie_joint::virtual_Z];
+    dynacore::pretty_print(sp_->Q_, std::cout, "ini config");
 }
 
 void ConfigBodyCtrl::LastVisit(){

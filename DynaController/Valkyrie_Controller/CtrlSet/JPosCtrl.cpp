@@ -22,8 +22,8 @@ JPosCtrl::JPosCtrl(RobotSystem* robot):Controller(robot),
     phase_.resize(valkyrie::num_act_joint, 0.);
 
     jpos_task_ = new JPosTask();
-    fixed_body_contact_ = new FixedBodyContact(robot);
-    //fixed_body_contact_ = new DoubleContact(robot);
+    //fixed_body_contact_ = new FixedBodyContact(robot);
+    fixed_body_contact_ = new DoubleContact(robot);
     std::vector<bool> act_list;
     act_list.resize(valkyrie::num_qdot, true);
     for(int i(0); i<valkyrie::num_virtual; ++i) act_list[i] = false;

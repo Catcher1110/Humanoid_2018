@@ -10,6 +10,7 @@ namespace valkyrie{
 
     constexpr int num_virtual = 6;
     constexpr double servo_rate = 0.001;
+    constexpr int num_leg_joint = 6;
 };
 
 namespace valkyrie_link{
