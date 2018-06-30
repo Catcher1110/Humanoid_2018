@@ -17,7 +17,6 @@ Valkyrie_InvKinematics::~Valkyrie_InvKinematics(){
     delete model_;
 }
 
-
 void Valkyrie_InvKinematics::getLegConfigAtVerticalPosture(
         int link_id, const dynacore::Vect3 & target_foot_pos,
         const dynacore::Vector & guess_Q, dynacore::Vector & config_sol){
@@ -177,6 +176,7 @@ void Valkyrie_InvKinematics::getSingleSupportFullConfigSeperation(
 
     int stance_bodyid = valkyrie_link::leftFoot;
     int swing_bodyid = valkyrie_link::rightFoot;
+    int body_id = valkyrie_link::torso;
 
     if(swing_foot_ == valkyrie_link::leftFoot) {
         stance_bodyid = valkyrie_link::rightFoot;
@@ -191,8 +191,7 @@ void Valkyrie_InvKinematics::getSingleSupportFullConfigSeperation(
 
     // contact jacobian and null space
     dynacore::Matrix Jc, J_full;
-    model_->getFullJacobian(stance_bodyid, J_full);
-    Jc = J_full.block(3, 0, 3, valkyrie::num_qdot);
+    model_->getFullJacobian(stance_bodyid, Jc);
     
     dynacore::Matrix Jc_pinv;
     double threshold = 0.0000001;
@@ -210,10 +209,7 @@ void Valkyrie_InvKinematics::getSingleSupportFullConfigSeperation(
     err[0] = des_height - current_Q[valkyrie_joint::virtual_Z];
     // Orientation
     dynacore::Quaternion curr_quat;
-    curr_quat.w() = current_Q[valkyrie::num_qdot];
-    curr_quat.x() = current_Q[3];
-    curr_quat.y() = current_Q[4];
-    curr_quat.z() = current_Q[5];
+    model_->getOri(body_id, curr_quat);
 
     dynacore::Quaternion err_quat = dynacore::QuatMultiply(des_quat, curr_quat.inverse());
     dynacore::Vect3 ori_err;
@@ -229,30 +225,27 @@ void Valkyrie_InvKinematics::getSingleSupportFullConfigSeperation(
         xdot[3 + i] = foot_vel[i];
         xddot[3 + i] = foot_acc[i];
     }
-
+    dynacore::Matrix J_body;
+    model_->getFullJacobian(body_id, J_body);
 
     //// Operational space Jacobian **********
     dynacore::Matrix Jop(3, valkyrie::num_qdot); Jop.setZero();
     Jop(0, 2) = 1.; // Height
-    Jop(1, 3) = 1.; // Roll
-    Jop(2, 4) = 1.; // Pitch
+    Jop.block(1, 0, 2, valkyrie::num_qdot) = J_body.block(0,0, 2, valkyrie::num_qdot);
+
+   //Jop.block(3, 0, 3, valkyrie::num_qdot) = Jfoot;
+
+    dynacore::Matrix JNc = Jop * Nc;
+    dynacore::Matrix JNc_pinv;
+    dynacore::pseudoInverse(JNc, threshold, JNc_pinv);
 
     dynacore::Matrix Jfoot;
     model_->getFullJacobian(swing_bodyid, J_full);
     Jfoot = J_full.block(3, 0, 3, valkyrie::num_qdot);
-    //Jop.block(3, 0, 3, valkyrie::num_qdot) = Jfoot;
-
-    dynacore::Matrix JNc = Jop * Nc;
-
-    dynacore::Matrix JNc_pinv;
-    dynacore::pseudoInverse(JNc, threshold, JNc_pinv);
-    // dynacore::Matrix JNc_pinv = JNc.completeOrthogonalDecomposition().pseudoInverse();
-
     Jfoot.block(0,0, 3,6) = dynacore::Matrix::Zero(3,6);
 
     dynacore::Matrix Jfoot_pinv;
     dynacore::pseudoInverse(Jfoot, threshold, Jfoot_pinv);
-    // dynacore::Matrix Jfoot_pinv = Jfoot.completeOrthogonalDecomposition().pseudoInverse();
 
     dynacore::Vector qdelta = JNc_pinv * err.head(3);
     qdot_cmd = JNc_pinv * xdot.head(3);
@@ -262,9 +255,13 @@ void Valkyrie_InvKinematics::getSingleSupportFullConfigSeperation(
     qdot_cmd += Jfoot_pinv*xdot.tail(3);
     qddot_cmd += Jfoot_pinv*xddot.tail(3);        
 
-
     config_sol.segment(valkyrie::num_virtual, valkyrie::num_act_joint) += 
         qdelta.segment(valkyrie::num_virtual, valkyrie::num_act_joint);
 
+    //dynacore::pretty_print(qdelta, std::cout, "delta");
+    //dynacore::pretty_print(current_Q, std::cout, "Current Q");
+    //dynacore::pretty_print(Jop, std::cout, "Jop");
+    //dynacore::pretty_print(Jfoot, std::cout, "Jfoot");
+    if(isnan(current_Q[1])){ exit(0); }
 }
 

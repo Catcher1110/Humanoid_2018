@@ -27,7 +27,7 @@ ConfigBodyCtrl::ConfigBodyCtrl(RobotSystem* robot):Controller(robot),
    
     wbdc_data_->cost_weight = 
     dynacore::Vector::Constant(
-        jpos_task_->getDim() + double_body_contact_->getDim(), 100.0);
+        jpos_task_->getDim() + double_body_contact_->getDim(), 1000.0);
 
     // wbdc_data_->cost_weight[0] = 10;    
     // wbdc_data_->cost_weight[1] = 10;    
@@ -36,8 +36,8 @@ ConfigBodyCtrl::ConfigBodyCtrl(RobotSystem* robot):Controller(robot),
     wbdc_data_->cost_weight.tail(double_body_contact_->getDim()) = 
         dynacore::Vector::Constant(double_body_contact_->getDim(), 1.);
 
-    wbdc_data_->cost_weight[jpos_task_->getDim() + 2] = 0.001;
     wbdc_data_->cost_weight[jpos_task_->getDim() + 5] = 0.001;
+    wbdc_data_->cost_weight[jpos_task_->getDim() + 11] = 0.001;
 
     sp_ = Valkyrie_StateProvider::getStateProvider();
 
@@ -118,7 +118,7 @@ void ConfigBodyCtrl::FirstVisit(){
     jpos_ini_ = sp_->Q_.segment(valkyrie::num_virtual, valkyrie::num_act_joint);
     ctrl_start_time_ = sp_->curr_time_;
     ini_body_height_ = sp_->Q_[valkyrie_joint::virtual_Z];
-    dynacore::pretty_print(sp_->Q_, std::cout, "ini config");
+    //dynacore::pretty_print(sp_->Q_, std::cout, "ini config");
 }
 
 void ConfigBodyCtrl::LastVisit(){

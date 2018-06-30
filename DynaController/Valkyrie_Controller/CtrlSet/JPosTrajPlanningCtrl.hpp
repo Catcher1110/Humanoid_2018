@@ -2,7 +2,6 @@
 #define JOINT_POSITION_TRAJECTORY_WALKING_CONTROL_VALKYRIE
 
 #include "SwingPlanningCtrl.hpp"
-#include <Utils/BSplineBasic.h>
 #include <Valkyrie_Controller/Valkyrie_InvKinematics.hpp>
 #include <Utils/minjerk_one_dim.hpp>
 
@@ -20,22 +19,21 @@ class JPosTrajPlanningCtrl:public SwingPlanningCtrl{
         virtual void CtrlInitialization(const std::string & setting_file_name);
 
     protected:
-        void _SetBspline(
-                const dynacore::Vect3 & st_pos,
-                const dynacore::Vect3 & st_vel,
-                const dynacore::Vect3 & st_acc,
-                const dynacore::Vect3 & target_pos);
-        void _SetJPosBspline(const dynacore::Vector & st_pos, 
-                const dynacore::Vector & target_pos, BS_Basic<4,4,0,3,3> & spline);
+        double pitch_offset_gain_;
+        double roll_offset_gain_;
+        dynacore::Vect2 body_pt_offset_;
+
+        int swing_leg_roll_jidx_;
+        int swing_leg_pitch_jidx_;
 
         void _SetMinJerkTraj(
                 double moving_duration,
-                const dynacore::Vect3 & st_pos,
-                const dynacore::Vect3 & st_vel,
-                const dynacore::Vect3 & st_acc,
-                const dynacore::Vect3 & target_pos,
-                const dynacore::Vect3 & target_vel,
-                const dynacore::Vect3 & target_acc);
+                const dynacore::Vector & st_pos,
+                const dynacore::Vector & st_vel,
+                const dynacore::Vector & st_acc,
+                const dynacore::Vector & target_pos,
+                const dynacore::Vector & target_vel,
+                const dynacore::Vector & target_acc);
 
 
         dynacore::Vector ini_swing_leg_config_;
@@ -50,13 +48,9 @@ class JPosTrajPlanningCtrl:public SwingPlanningCtrl{
         double push_down_height_; // push foot below the ground at landing
         dynacore::Vect3 default_target_loc_;
 
-        std::vector<double> foot_landing_offset_;
-
         dynacore::Vector task_kp_;
         dynacore::Vector task_kd_;
 
-        double gain_decreasing_ratio_;
-        double gain_decreasing_period_portion_;
         void _setTaskGain(const dynacore::Vector & Kp, const dynacore::Vector & Kd);
 
         Task* config_body_foot_task_;
@@ -71,18 +65,9 @@ class JPosTrajPlanningCtrl:public SwingPlanningCtrl{
         dynacore::Vect3 ini_com_pos_;
         dynacore::Vect3 ini_foot_pos_;
         dynacore::Vect3 target_foot_pos_;
-        dynacore::Vect2 body_pt_offset_;
-
-        dynacore::Vect2 prev_ekf_vel;
-        dynacore::Vect2 acc_err_ekf;
         
         dynacore::Vector ini_config_;
-        BS_Basic<3, 3, 1, 2, 2> foot_traj_;
-        BS_Basic<4, 4, 0, 3, 3> mid_jpos_traj_;
-        BS_Basic<4, 4, 0, 3, 3> end_jpos_traj_;
         std::vector<MinJerk_OneDimension*> min_jerk_jpos_initial_;
-
-        double swing_time_reduction_;
 
         void _task_setup();
         void _single_contact_setup();
