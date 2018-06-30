@@ -23,18 +23,13 @@
 
 Valkyrie_interface::Valkyrie_interface():
     interface(),
-    torque_command_(valkyrie::num_act_joint),
-    jpos_command_(valkyrie::num_act_joint),
-    jvel_command_(valkyrie::num_act_joint),
     jjvel_(valkyrie::num_act_joint),
     jjpos_(valkyrie::num_act_joint),
+    initial_upper_body_config_(valkyrie::num_upper_joint),
     waiting_count_(2)
 {
 
     robot_sys_ = new Valkyrie_Model();
-    torque_command_.setZero();
-    jpos_command_.setZero();
-    jvel_command_.setZero();
     jjvel_.setZero();
     jjpos_.setZero();
 
@@ -43,13 +38,7 @@ Valkyrie_interface::Valkyrie_interface():
     state_estimator_ = new Valkyrie_StateEstimator(robot_sys_);  
     
     DataManager::GetDataManager()->RegisterData(
-            &jpos_command_, DYN_VEC, "jpos_des", valkyrie::num_act_joint);
-    DataManager::GetDataManager()->RegisterData(
-            &jvel_command_, DYN_VEC, "jvel_des", valkyrie::num_act_joint);
-    DataManager::GetDataManager()->RegisterData(
             &running_time_, DOUBLE, "running_time");
-    DataManager::GetDataManager()->RegisterData(
-            &torque_command_, DYN_VEC, "command", valkyrie::num_act_joint);
     DataManager::GetDataManager()->RegisterData(
             &jjpos_, DYN_VEC, "jjpos", valkyrie::num_act_joint);
     DataManager::GetDataManager()->RegisterData(
@@ -82,6 +71,13 @@ void Valkyrie_interface::GetCommand( void* _data, void* _command){
         jjvel_[i] = data->jvel[i];
         jjpos_[i] = data->jpos[i];
     }
+
+    // Fix Upper Body
+    for (int i(0); i<valkyrie::num_upper_joint; ++i){
+        cmd->jpos_cmd[valkyrie::upper_body_start_jidx - valkyrie::num_virtual + i] 
+            = initial_upper_body_config_[i];
+        cmd->jvel_cmd[valkyrie::upper_body_start_jidx - valkyrie::num_virtual +  i] = 0.;
+    }
     running_time_ = (double)(count_) * valkyrie::servo_rate;
     ++count_;
     // When there is sensed time
@@ -103,6 +99,8 @@ bool Valkyrie_interface::_Initialization(Valkyrie_SensorData* data){
         }
         state_estimator_->Initialization(data);
 
+        initial_upper_body_config_ = 
+            sp_->Q_.segment(valkyrie::upper_body_start_jidx, valkyrie::num_upper_joint);
         DataManager::GetDataManager()->start();
         return true;
     }

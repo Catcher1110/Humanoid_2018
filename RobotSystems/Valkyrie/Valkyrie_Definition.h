@@ -1,30 +1,6 @@
 #ifndef VALKYRIE_DEFINITION
 #define VALKYRIE_DEFINITION
 
-
-namespace valkyrie{
-    // Simple version
-    constexpr int num_q = 35;
-    constexpr int num_qdot = 34;
-    constexpr int num_act_joint = 28;
-
-    constexpr int num_virtual = 6;
-    constexpr double servo_rate = 0.001;
-    constexpr int num_leg_joint = 6;
-};
-
-namespace valkyrie_link{
-    constexpr int pelvis = 0;
-    constexpr int torso = 1;
-    constexpr int rightCOP_Frame = 2;
-    constexpr int leftCOP_Frame = 3;
-    constexpr int rightPalm = 4;
-    constexpr int leftPalm = 5;
-    constexpr int head = 6;
-    constexpr int rightFoot = 7;
-    constexpr int leftFoot = 8;
-}
-
 namespace valkyrie_joint{
     constexpr int  virtual_X = 0;
     constexpr int  virtual_Y = 1;
@@ -68,6 +44,31 @@ namespace valkyrie_joint{
     constexpr int  rightForearmYaw = 33;
 
     constexpr int  virtual_Rw = 34;
+}
+
+namespace valkyrie{
+    // Simple version
+    constexpr int num_q = 35;
+    constexpr int num_qdot = 34;
+    constexpr int num_act_joint = 28;
+
+    constexpr int num_virtual = 6;
+    constexpr double servo_rate = 0.001;
+    constexpr int num_leg_joint = 6;
+    constexpr int upper_body_start_jidx = valkyrie_joint::leftShoulderPitch;
+    constexpr int num_upper_joint = valkyrie_joint::virtual_Rw - valkyrie_joint::leftShoulderPitch;
+};
+
+namespace valkyrie_link{
+    constexpr int pelvis = 0;
+    constexpr int torso = 1;
+    constexpr int rightCOP_Frame = 2;
+    constexpr int leftCOP_Frame = 3;
+    constexpr int rightPalm = 4;
+    constexpr int leftPalm = 5;
+    constexpr int head = 6;
+    constexpr int rightFoot = 7;
+    constexpr int leftFoot = 8;
 }
 
 #endif
