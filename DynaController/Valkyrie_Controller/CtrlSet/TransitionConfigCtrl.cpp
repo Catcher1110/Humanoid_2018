@@ -41,6 +41,7 @@ TransitionConfigCtrl::TransitionConfigCtrl(RobotSystem* robot, int moving_foot, 
     wbdc_data_->cost_weight[config_task_->getDim() + 11]  = 0.001; // Fr_z
 
     sp_ = Valkyrie_StateProvider::getStateProvider();
+    inv_kin_ = new Valkyrie_InvKinematics();
     printf("[Transition Controller] Constructed\n");
 }
 
@@ -94,7 +95,7 @@ void TransitionConfigCtrl::_body_task_setup(){
     pos_des[6] = quat_des.z();
 
     dynacore::Vector config_sol;
-    inv_kin_.getDoubleSupportLegConfig(sp_->Q_, quat_des, target_height, config_sol);
+    inv_kin_->getDoubleSupportLegConfig(sp_->Q_, quat_des, target_height, config_sol);
     for (int i(0); i<valkyrie::num_act_joint; ++i){
         pos_des[valkyrie::num_virtual + i] = config_sol[valkyrie::num_virtual + i];  
         des_jpos_[i] = pos_des[valkyrie::num_virtual + i];

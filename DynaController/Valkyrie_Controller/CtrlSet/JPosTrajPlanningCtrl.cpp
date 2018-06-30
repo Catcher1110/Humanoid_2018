@@ -30,12 +30,15 @@ JPosTrajPlanningCtrl::JPosTrajPlanningCtrl(
         swing_leg_jidx_ = valkyrie_joint::leftHipYaw;
         swing_leg_roll_jidx_ = valkyrie_joint::leftHipRoll;
         swing_leg_pitch_jidx_ = valkyrie_joint::leftHipPitch;
+
+        inv_kin_ = new Valkyrie_InvKinematics(swing_foot, valkyrie_link::rightFoot);
     }
     else if(swing_foot == valkyrie_link::rightFoot) {
         single_contact_ = new SingleContact(robot, valkyrie_link::leftFoot);
         swing_leg_jidx_ = valkyrie_joint::rightHipYaw;
         swing_leg_roll_jidx_ = valkyrie_joint::rightHipRoll;
         swing_leg_pitch_jidx_ = valkyrie_joint::rightHipPitch;
+        inv_kin_ = new Valkyrie_InvKinematics(swing_foot, valkyrie_link::leftFoot);
     }
     else printf("[Warnning] swing foot is not foot: %i\n", swing_foot);
 
@@ -156,11 +159,12 @@ void JPosTrajPlanningCtrl::_task_setup(){
     _CheckPlanning();
     double traj_time = state_machine_time_ - replan_moment_;
 
-    dynacore::Vector config_sol, qdot_cmd, qddot_cmd;
-    inv_kin_.getSingleSupportFullConfigSeperation(
-            sp_->Q_, des_quat, target_height, 
-            swing_foot_, curr_foot_pos_des_, curr_foot_vel_des_, curr_foot_acc_des_,
-            config_sol, qdot_cmd, qddot_cmd);
+    dynacore::Vector config_sol; 
+    dynacore::Vector qdot_cmd = dynacore::Vector::Zero(valkyrie::num_qdot);
+    dynacore::Vector qddot_cmd = dynacore::Vector::Zero(valkyrie::num_qdot);
+
+    inv_kin_->getSingleSupportStanceLegConfiguration(
+            sp_->Q_, des_quat, target_height, config_sol);
 
     double ramp_time(0.02);
     if(state_machine_time_ > half_swing_time_){
@@ -230,8 +234,7 @@ void JPosTrajPlanningCtrl::_CheckPlanning(){
         dynacore::Vector config_sol = sp_->Q_;
 
         // Update Target config
-        inv_kin_.getLegConfigAtVerticalPosture(
-                swing_foot_, target_loc, guess_q, config_sol);
+        inv_kin_->getLegConfigAtVerticalPosture(target_loc, guess_q, config_sol);
         target_swing_leg_config_ = 
             config_sol.segment(swing_leg_jidx_, valkyrie::num_leg_joint);
 
@@ -316,12 +319,11 @@ void JPosTrajPlanningCtrl::FirstVisit(){
     middle_pos = (ini_foot_pos_ + target_loc)/2.;
     middle_pos[2] = swing_height_ + target_loc[2];
 
-    inv_kin_.getLegConfigAtVerticalPosture(
-            swing_foot_, middle_pos, sp_->Q_, config_sol);
+    inv_kin_->getLegConfigAtVerticalPosture(middle_pos, sp_->Q_, config_sol);
     mid_swing_leg_config_ = config_sol.segment(swing_leg_jidx_, valkyrie::num_leg_joint);
 
     // Compute Target config
-    inv_kin_.getLegConfigAtVerticalPosture(swing_foot_, target_loc, sp_->Q_, config_sol);
+    inv_kin_->getLegConfigAtVerticalPosture(target_loc, sp_->Q_, config_sol);
     target_swing_leg_config_ = 
         config_sol.segment(swing_leg_jidx_, valkyrie::num_leg_joint);
 

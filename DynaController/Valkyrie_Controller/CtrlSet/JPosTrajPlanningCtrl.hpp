@@ -73,7 +73,7 @@ class JPosTrajPlanningCtrl:public SwingPlanningCtrl{
         void _single_contact_setup();
         void _body_foot_ctrl(dynacore::Vector & gamma);
 
-        Valkyrie_InvKinematics inv_kin_;
+        Valkyrie_InvKinematics* inv_kin_;
         double ctrl_start_time_;
 };
 
