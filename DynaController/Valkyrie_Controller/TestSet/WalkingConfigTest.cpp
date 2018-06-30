@@ -99,8 +99,6 @@ int WalkingConfigTest::_NextPhase(const int & phase){
 
     if(phase == WkConfigPhase::double_contact_1) {
         ++num_step_;
-        printf("%i th step:\n", num_step_);
-        // printf("One swing done: Next Right Leg Swing\n");
         sp_->stance_foot_ = valkyrie_link::leftFoot;
 
         // Global Frame Update
@@ -111,11 +109,10 @@ int WalkingConfigTest::_NextPhase(const int & phase){
         if(num_step_>1) sp_->global_pos_local_ += next_local_frame_location;
         
         dynacore::pretty_print(next_local_frame_location, std::cout, "landing loc");
+        printf("%i th step:\n", num_step_);
     }
     if(phase == WkConfigPhase::double_contact_2){
         ++num_step_;
-        printf("%i th step:\n", num_step_);
-
         sp_->stance_foot_ = valkyrie_link::rightFoot;
 
         // Global Frame Update
@@ -124,6 +121,7 @@ int WalkingConfigTest::_NextPhase(const int & phase){
         sp_->global_pos_local_ += next_local_frame_location;
         
         dynacore::pretty_print(next_local_frame_location, std::cout, "landing loc");
+        printf("%i th step:\n", num_step_);
     }
 
     sp_->num_step_copy_ = num_step_;

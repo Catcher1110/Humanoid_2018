@@ -248,8 +248,8 @@ void JPosTrajPlanningCtrl::_Replanning(dynacore::Vect3 & target_loc){
     // Direct value used
     robot_sys_->getCoMPosition(com_pos);
     robot_sys_->getCoMVelocity(com_vel);
-    dynacore::pretty_print(com_pos, std::cout, "com pos");
-    dynacore::pretty_print(com_vel, std::cout, "com vel");
+    //dynacore::pretty_print(com_pos, std::cout, "com pos");
+    //dynacore::pretty_print(com_vel, std::cout, "com vel");
     
     com_pos[0] = sp_->Q_[0] + body_pt_offset_[0]; 
     com_pos[1] = sp_->Q_[1] + body_pt_offset_[1]; 
