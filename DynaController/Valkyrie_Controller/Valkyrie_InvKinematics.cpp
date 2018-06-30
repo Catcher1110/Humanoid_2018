@@ -202,11 +202,12 @@ void Valkyrie_InvKinematics::getSingleSupportFullConfigSeperation(
         Jc_pinv * Jc;
 
     //// Operational Space error (height, Rx, Ry, foot_x, foot_y, foot_z) *****
+    dynacore::Vector body_err(5);
+    dynacore::Matrix Jop(5, valkyrie::num_qdot); Jop.setZero();
+
     // Height
-    dynacore::Vector err(6);
-    dynacore::Vector xdot(6); xdot.setZero();
-    dynacore::Vector xddot(6); xddot.setZero();
-    err[0] = des_height - current_Q[valkyrie_joint::virtual_Z];
+    body_err[0] = des_height - current_Q[valkyrie_joint::virtual_Z];
+    
     // Orientation
     dynacore::Quaternion curr_quat;
     model_->getOri(body_id, curr_quat);
@@ -214,31 +215,46 @@ void Valkyrie_InvKinematics::getSingleSupportFullConfigSeperation(
     dynacore::Quaternion err_quat = dynacore::QuatMultiply(des_quat, curr_quat.inverse());
     dynacore::Vect3 ori_err;
     dynacore::convert(err_quat, ori_err);
-    err[1] = ori_err[0];
-    err[2] = ori_err[1];
+    body_err[1] = ori_err[0];
+    body_err[2] = ori_err[1];
 
-    // Foot
-    dynacore::Vect3 swingfoot_pos;
-    model_->getPos(swing_bodyid, swingfoot_pos);
-    for(int i(0); i<3; ++i) {
-        err[3+ i] = foot_pos[i] - swingfoot_pos[i];
-        xdot[3 + i] = foot_vel[i];
-        xddot[3 + i] = foot_acc[i];
-    }
-    dynacore::Matrix J_body;
+    model_->getOri(valkyrie_link::pelvis, curr_quat);
+    err_quat = dynacore::QuatMultiply(des_quat, curr_quat.inverse());
+    dynacore::convert(err_quat, ori_err);
+    body_err[3] = ori_err[0];
+    body_err[4] = ori_err[1];
+  
+    // Jacobian 
+    dynacore::Matrix J_body, J_pelvis;
     model_->getFullJacobian(body_id, J_body);
-
-    //// Operational space Jacobian **********
-    dynacore::Matrix Jop(3, valkyrie::num_qdot); Jop.setZero();
+    model_->getFullJacobian(valkyrie_link::pelvis, J_pelvis);
+    
     Jop(0, 2) = 1.; // Height
     Jop.block(1, 0, 2, valkyrie::num_qdot) = J_body.block(0,0, 2, valkyrie::num_qdot);
-
-   //Jop.block(3, 0, 3, valkyrie::num_qdot) = Jfoot;
-
+    Jop.block(3, 3, 2, 2) = dynacore::Matrix::Identity(2,2);
+    
     dynacore::Matrix JNc = Jop * Nc;
     dynacore::Matrix JNc_pinv;
     dynacore::pseudoInverse(JNc, threshold, JNc_pinv);
+    dynacore::Vector qdelta = JNc_pinv * body_err;
+    
+    //dynacore::pretty_print(J_pelvis, std::cout, "Jacob pelvis");
+    //dynacore::pretty_print(curr_quat, std::cout, "pelvis quat");
+    //dynacore::pretty_print(current_Q, std::cout, "curr q");
+ 
+   //Jop.block(3, 0, 3, valkyrie::num_qdot) = Jfoot;
 
+    // Foot
+    dynacore::Vect3 swingfoot_pos;
+    dynacore::Vect3 foot_err, xdot, xddot;
+
+    model_->getPos(swing_bodyid, swingfoot_pos);
+    for(int i(0); i<3; ++i) {
+        foot_err[i] = foot_pos[i] - swingfoot_pos[i];
+        xdot[i] = foot_vel[i];
+        xddot[i] = foot_acc[i];
+    }
+ 
     dynacore::Matrix Jfoot;
     model_->getFullJacobian(swing_bodyid, J_full);
     Jfoot = J_full.block(3, 0, 3, valkyrie::num_qdot);
@@ -247,13 +263,9 @@ void Valkyrie_InvKinematics::getSingleSupportFullConfigSeperation(
     dynacore::Matrix Jfoot_pinv;
     dynacore::pseudoInverse(Jfoot, threshold, Jfoot_pinv);
 
-    dynacore::Vector qdelta = JNc_pinv * err.head(3);
-    qdot_cmd = JNc_pinv * xdot.head(3);
-    qddot_cmd = JNc_pinv * xddot.head(3);
-
-    qdelta += Jfoot_pinv*err.tail(3);
-    qdot_cmd += Jfoot_pinv*xdot.tail(3);
-    qddot_cmd += Jfoot_pinv*xddot.tail(3);        
+    qdelta += Jfoot_pinv * foot_err;
+    qdot_cmd += Jfoot_pinv * xdot;
+    qddot_cmd += Jfoot_pinv * xddot;
 
     config_sol.segment(valkyrie::num_virtual, valkyrie::num_act_joint) += 
         qdelta.segment(valkyrie::num_virtual, valkyrie::num_act_joint);
