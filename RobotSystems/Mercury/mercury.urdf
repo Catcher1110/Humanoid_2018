@@ -19,7 +19,7 @@
       <geometry>
          <mesh filename="meshes/color_torso.dae" scale="0.001 0.001 0.001"/>
       </geometry>
-      <origin rpy="3.14159 0 1.5708" xyz="-0.165 -0.21 -0.033"/>
+      <origin rpy="0 0 0" xyz="-0.165 -0.21 -0.033"/>
     </visual>
   </link>
   <!-- IMU -->
