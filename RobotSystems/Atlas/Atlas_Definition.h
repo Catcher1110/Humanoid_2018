@@ -2,15 +2,6 @@
 #define ATLAS_DEFINITION
 
 
-namespace atlas{
-    // Simple version
-    constexpr int num_q = 35;
-    constexpr int num_qdot = 34;
-    constexpr int num_act_joint = 28;
-
-    constexpr int num_virtual = 6;
-    constexpr double servo_rate = 0.001;
-};
 
 namespace atlas_link{
     constexpr int pelvis = 0;
@@ -25,39 +16,60 @@ namespace atlas_link{
 }
 
 namespace atlas_joint{
-    constexpr int  leftHipYaw = 0;
-    constexpr int  leftHipRoll = 1;
-    constexpr int  leftHipPitch = 2;
-    constexpr int  leftKneePitch = 3;
-    constexpr int  leftAnklePitch = 4;
-    constexpr int  leftAnkleRoll = 5;
+    constexpr int  virtual_X = 0;
+    constexpr int  virtual_Y = 1;
+    constexpr int  virtual_Z = 2;
+    constexpr int  virtual_Rx = 3;
+    constexpr int  virtual_Ry = 4;
+    constexpr int  virtual_Rz = 5;
 
-    constexpr int  rightHipYaw = 6;
-    constexpr int  rightHipRoll = 7;
-    constexpr int  rightHipPitch = 8;
-    constexpr int  rightKneePitch = 9;
-    constexpr int  rightAnklePitch = 10;
-    constexpr int  rightAnkleRoll = 11;
-        
-    constexpr int  torsoYaw = 12;
-    constexpr int  torsoPitch = 13;
-    constexpr int  torsoRoll = 14;
+    constexpr int  leftHipYaw = 6; // 1st joint
+    constexpr int  leftHipRoll = 7;
+    constexpr int  leftHipPitch = 8;
+    constexpr int  leftKneePitch = 9;
+    constexpr int  leftAnklePitch = 10;
+    constexpr int  leftAnkleRoll = 11;
 
-    constexpr int  leftShoulderPitch = 15;
-    constexpr int  leftShoulderRoll = 16;
-    constexpr int  leftShoulderYaw = 17;
-    constexpr int  leftElbowPitch = 18;
-    constexpr int  leftForearmYaw = 19;
+    constexpr int  rightHipYaw = 12;
+    constexpr int  rightHipRoll = 13;
+    constexpr int  rightHipPitch = 14;
+    constexpr int  rightKneePitch = 15;
+    constexpr int  rightAnklePitch = 16;
+    constexpr int  rightAnkleRoll = 17;
 
-    constexpr int  lowerNeckPitch = 20;
-    constexpr int  neckYaw = 21;
-    constexpr int  upperNeckPitch = 22;
+    constexpr int  torsoYaw = 18;
+    constexpr int  torsoPitch = 19;
+    constexpr int  torsoRoll = 20;
 
-    constexpr int  rightShoulderPitch = 23;
-    constexpr int  rightShoulderRoll = 24;
-    constexpr int  rightShoulderYaw = 25;
-    constexpr int  rightElbowPitch = 26;
-    constexpr int  rightForearmYaw = 27;
+    constexpr int  leftShoulderPitch = 21;
+    constexpr int  leftShoulderRoll = 22;
+    constexpr int  leftShoulderYaw = 23;
+    constexpr int  leftElbowPitch = 24;
+    constexpr int  leftForearmYaw = 25;
 
+    constexpr int  lowerNeckPitch = 26;
+    constexpr int  neckYaw = 27;
+    constexpr int  upperNeckPitch = 28;
+
+    constexpr int  rightShoulderPitch = 29;
+    constexpr int  rightShoulderRoll = 30;
+    constexpr int  rightShoulderYaw = 31;
+    constexpr int  rightElbowPitch = 32;
+    constexpr int  rightForearmYaw = 33;
+
+    constexpr int  virtual_Rw = 34;
 }
+
+namespace atlas{
+    // Simple version
+    constexpr int num_q = 35;
+    constexpr int num_qdot = 34;
+    constexpr int num_act_joint = 28;
+
+    constexpr int num_virtual = 6;
+    constexpr double servo_rate = 0.001;
+    constexpr int num_leg_joint = 6;
+    constexpr int upper_body_start_jidx = atlas_joint::leftShoulderPitch;
+    constexpr int num_upper_joint = atlas_joint::virtual_Rw - atlas_joint::leftShoulderPitch;
+};
 #endif

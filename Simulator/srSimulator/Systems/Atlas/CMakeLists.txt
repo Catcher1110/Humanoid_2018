@@ -12,7 +12,7 @@ target_link_libraries (simulation_atlas
   util
   ${OPENGL_LIBRARIES}
   dynacore_urdf
-  #Atlas_Controller
+  Atlas_Controller
 )
 
 if (APPLE)
