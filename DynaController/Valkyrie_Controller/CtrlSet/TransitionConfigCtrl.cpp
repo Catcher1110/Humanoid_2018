@@ -36,11 +36,12 @@ TransitionConfigCtrl::TransitionConfigCtrl(RobotSystem* robot, int moving_foot, 
     // wbdc_data_->cost_weight[2] = 200;    
 
     wbdc_data_->cost_weight.tail(double_contact_->getDim()) = 
-        dynacore::Vector::Constant(double_contact_->getDim(), 1.0);
-    wbdc_data_->cost_weight[config_task_->getDim() + 2]  = 0.001; // Fr_z
+        dynacore::Vector::Constant(double_contact_->getDim(), 1000.0);
     wbdc_data_->cost_weight[config_task_->getDim() + 5]  = 0.001; // Fr_z
+    wbdc_data_->cost_weight[config_task_->getDim() + 11]  = 0.001; // Fr_z
 
     sp_ = Valkyrie_StateProvider::getStateProvider();
+    inv_kin_ = new Valkyrie_InvKinematics();
     printf("[Transition Controller] Constructed\n");
 }
 
@@ -94,7 +95,7 @@ void TransitionConfigCtrl::_body_task_setup(){
     pos_des[6] = quat_des.z();
 
     dynacore::Vector config_sol;
-    inv_kin_.getDoubleSupportLegConfig(sp_->Q_, quat_des, target_height, config_sol);
+    inv_kin_->getDoubleSupportLegConfig(sp_->Q_, quat_des, target_height, config_sol);
     for (int i(0); i<valkyrie::num_act_joint; ++i){
         pos_des[valkyrie::num_virtual + i] = config_sol[valkyrie::num_virtual + i];  
         des_jpos_[i] = pos_des[valkyrie::num_virtual + i];
@@ -137,7 +138,6 @@ bool TransitionConfigCtrl::EndOfPhase(){
     return false;
 }
 void TransitionConfigCtrl::CtrlInitialization(const std::string & setting_file_name){
-    robot_sys_->getCoMPosition(ini_body_pos_);
     std::vector<double> tmp_vec;
     ParamHandler handler(ValkyrieConfigPath + setting_file_name + ".yaml");
     handler.getValue("max_rf_z", max_rf_z_);

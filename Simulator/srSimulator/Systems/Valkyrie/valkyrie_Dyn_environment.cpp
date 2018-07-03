@@ -37,7 +37,7 @@ Valkyrie_Dyn_environment::Valkyrie_Dyn_environment()
     m_Space->SetTimestep(valkyrie::servo_rate);
     m_Space->SetGravity(0.0,0.0,-9.81);
 
-    m_Space->SetNumberofSubstepForRendering(15);
+    m_Space->SetNumberofSubstepForRendering(25);
 
     printf("[Valkyrie Dynamic Environment] Build Dynamic Environment\n");
 }
@@ -58,7 +58,9 @@ void Valkyrie_Dyn_environment::ControlFunction( void* _data ) {
         p_data->jvel[i] = robot->r_joint_[i]->m_State.m_rValue[1];
     }
 
-    pDyn_env->_CheckFootContact();
+
+    pDyn_env->_CheckFootContact(
+            p_data->rfoot_contact, p_data->lfoot_contact);
 
     for (int i(0); i<3; ++i){
         p_data->imu_ang_vel[i] = 
@@ -72,7 +74,16 @@ void Valkyrie_Dyn_environment::ControlFunction( void* _data ) {
         robot->vr_joint_[i]->m_State.m_rCommand = 0.0;
     }
 
-    double Kp(500.);
+    if( count < 100 ){
+        robot->vp_joint_[0]->m_State.m_rCommand = 
+            -5000. * robot->vp_joint_[0]->m_State.m_rValue[0]
+            - 10. * robot->vp_joint_[0]->m_State.m_rValue[1];
+        robot->vp_joint_[1]->m_State.m_rCommand = 
+            -5000. * robot->vp_joint_[1]->m_State.m_rValue[0]
+            - 10. * robot->vp_joint_[1]->m_State.m_rValue[1];
+    }
+
+    double Kp(200.);
     double Kd(5.);
      //double Kp(30.);
      //double Kd(0.5);
@@ -127,33 +138,25 @@ Valkyrie_Dyn_environment::~Valkyrie_Dyn_environment()
     SR_SAFE_DELETE(m_ground);
 }
 
-void Valkyrie_Dyn_environment::_CheckFootContact(){
+void Valkyrie_Dyn_environment::_CheckFootContact(bool & r_contact, bool & l_contact){
     //Valkyrie_StateProvider::getStateProvider()->b_both_contact_ = false;
 
-    // Vec3 lfoot_pos = new_robot_->link_[new_robot_->link_idx_map_.find("leftCOP_Frame")->second]->GetPosition();
-    // Vec3 rfoot_pos = new_robot_->link_[new_robot_->link_idx_map_.find("rightCOP_Frame")->second]->GetPosition();
+    Vec3 lfoot_pos = new_robot_->
+        link_[new_robot_->link_idx_map_.find("leftCOP_Frame")->second]->GetPosition();
+    Vec3 rfoot_pos = new_robot_->
+        link_[new_robot_->link_idx_map_.find("rightCOP_Frame")->second]->GetPosition();
 
-    // double lheight(0.);
-    // double rheight(0.);
-    // if(lfoot_pos[0] > loc_x_){
-    //   lheight = (lfoot_pos[0] - loc_x_)*tan(slope_) + 0.003;
-    // }
-    // if(rfoot_pos[0] > loc_x_){
-    //   rheight = (rfoot_pos[0] - loc_x_)*tan(slope_) + 0.005;
-    // }
+    //std::cout<<rfoot_pos<<std::endl;
+    //std::cout<<lfoot_pos<<std::endl;
 
-    // if(  fabs(lheight - lfoot_pos[2]) < 0.005 && fabs(rheight -rfoot_pos[2])<0.005  ){
-    //   std::cout<<"left"<<std::endl;
-    //   std::cout<<lfoot_pos;
-    //   printf("left height: %f\n", lheight);
+    if(  fabs(lfoot_pos[2]) < 0.015){
+        l_contact = true;
+        //printf("left contact\n");
+    }else { l_contact = false; }
+    if (fabs(rfoot_pos[2])<0.015  ){
+        r_contact = true;
+        //printf("right contact\n");
+    } else { r_contact = false; }
 
-
-    //   std::cout<<"right"<<std::endl;
-    //   std::cout<<rfoot_pos;
-    //   printf("right height: %f\n", rheight);
-
-    //   Valkyrie_StateProvider::getStateProvider()->b_both_contact_ = true;
-    // } else {
-    //   Valkyrie_StateProvider::getStateProvider()->b_both_contact_ = false;
-    // }
+    //printf("\n");
 }

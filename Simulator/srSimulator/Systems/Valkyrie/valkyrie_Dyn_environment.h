@@ -65,8 +65,8 @@ protected:
   void _Draw_Contact_Force();
   void _Draw_Commanded_Force();
   void _DrawHollowCircle(GLfloat x, GLfloat y, GLfloat z, GLfloat radius);
-  void _CheckFootContact();
-  //void _Draw_FootPlacement();
+  void _CheckFootContact(bool & r_contact, bool & l_contact);
+      //void _Draw_FootPlacement();
 };
 
 #endif

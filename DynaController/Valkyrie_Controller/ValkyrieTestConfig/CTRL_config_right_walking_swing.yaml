@@ -1,42 +1,28 @@
 planner_name: velocity_reversal_lipm
 swing_height: 0.1
 push_down_height: 0.0
-#push_down_height: 0.02
-default_target_foot_location: [-0.07, -0.13, 0.0]
+#push_down_height: 0.03
+default_target_foot_location: [-0.0, -0.2, 0.0]
 
 ## Feedback Gain
 # virtual (x, y, z, Rx, Ry, Rz) config x28
 Kp: [0, 0, 0, 0, 0, 0, 
-     135, 135, 135, 135, 135, 135, 
-     135, 135, 135, 135, 135, 135, 
-     135, 135, 135, 
-     135, 135, 135, 135, 135, 
-     135, 135, 135,
-     135, 135, 135, 135, 135 ]
+     700, 700, 700, 700, 700, 700, 
+     700, 700, 700, 700, 700, 700, 
+     700, 700, 700, 
+     700, 700, 700, 700, 700, 
+     700, 700, 700,
+     700, 700, 700, 700, 700 ]
 
 Kd: [0, 0, 0, 0, 0, 0, 
-     10, 10, 10, 10, 10, 10, 
-     10, 10, 10, 10, 10, 10, 
-     10, 10, 10, 
-     10, 10, 10, 10, 10, 
-     10, 10, 10,
-     10, 10, 10, 10, 10 ]
+     40, 40, 40, 40, 40, 40, 
+     40, 40, 40, 40, 40, 40, 
+     40, 40, 40, 
+     40, 40, 40, 40, 40, 
+     40, 40, 40,
+     40, 40, 40, 40, 40 ]
 
+roll_offset_gain: -3.0
+pitch_offset_gain: -4.0
 
-gain_decreasing_ratio: 1.0
-gain_decreasing_period_portion: 0.0
-
-body_pt_offset: [0.0, 0.0]
-swing_time_reduction: 0.0
-foot_landing_offset: [-0.0, 0.]
-
-#body_pt_offset: [-0.077, 0.0]
-#foot_landing_offset: [0.0, 0.]
-#swing_time_reduction: 0.0
-
-initial_planning: false
-#initial_planning: true
-kp_x: 1.0
-kp_y: 0.5
-
-hip_knee_retraction_angle: [-0.639, 1.17]
+body_pt_offset: [0.00, 0.0]

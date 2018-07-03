@@ -56,7 +56,7 @@ protected:
   void _body_ctrl_wbdc(dynacore::Vector & gamma);
 
   Valkyrie_StateProvider* sp_;
-  Valkyrie_InvKinematics inv_kin_;
+  Valkyrie_InvKinematics* inv_kin_;
   double ctrl_start_time_;
 };
 #endif

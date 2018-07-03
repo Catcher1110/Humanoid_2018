@@ -56,7 +56,7 @@ class ConfigBodyCtrl: public Controller{
 
         double ctrl_start_time_;
         Valkyrie_StateProvider* sp_;
-        Valkyrie_InvKinematics inv_kin_;
+        Valkyrie_InvKinematics* inv_kin_;
 };
 
 #endif
