@@ -11,8 +11,8 @@ using namespace RigidBodyDynamics::Math;
 Atlas_Model::Atlas_Model(){
     model_ = new Model();
     if (!Addons::URDFReadFromFile 
-            (THIS_COM"RobotSystems/Atlas/atlas_simple.urdf", model_, false)) {
-        std::cerr << "Error loading model atlas_simple.urdf" << std::endl;
+            (THIS_COM"RobotSystems/Atlas/atlas_v3_no_head.urdf", model_, false)) {
+        std::cerr << "Error loading model atlas_v3_no_head.urdf" << std::endl;
         abort();
     }
     dyn_model_ = new Atlas_Dyn_Model(model_);

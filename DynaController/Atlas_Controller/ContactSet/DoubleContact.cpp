@@ -42,13 +42,13 @@ bool DoubleContact::_UpdateUf(){
   _setU(X, Y, mu, U);
   Eigen::Quaternion<double> quat_tmp;
 
-  robot_sys_->getOri(atlas_link::rightCOP_Frame, quat_tmp);
+  robot_sys_->getOri(atlas_link::rightFoot, quat_tmp);
   Eigen::Matrix3d R_rfoot_mtx(quat_tmp);
   dynacore::Matrix R_rfoot(6,6); R_rfoot.setZero();
   R_rfoot.block(0,0, 3,3) = R_rfoot_mtx.transpose();
   R_rfoot.block(3,3, 3,3) = R_rfoot_mtx.transpose();
 
-  robot_sys_->getOri(atlas_link::leftCOP_Frame, quat_tmp);
+  robot_sys_->getOri(atlas_link::leftFoot, quat_tmp);
   Eigen::Matrix3d R_lfoot_mtx(quat_tmp);
   dynacore::Matrix R_lfoot(6,6); R_lfoot.setZero();
   R_lfoot.block(0,0, 3,3) = R_lfoot_mtx.transpose();

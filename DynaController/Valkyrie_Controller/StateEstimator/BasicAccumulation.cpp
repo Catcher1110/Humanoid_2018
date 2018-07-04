@@ -1,9 +1,8 @@
 #include "BasicAccumulation.hpp"
 #include <Configuration.h>
 #include <Utils/utilities.hpp>
-#include <Mercury/Mercury_Definition.h>
 #include <Utils/DataManager.hpp>
-
+#include <Valkyrie/Valkyrie_Definition.h>
 
 BasicAccumulation::BasicAccumulation():OriEstimator(){
 }
@@ -30,7 +29,7 @@ void BasicAccumulation::setSensorData(const std::vector<double> & acc,
     body_omega[i] = ang_vel[i];
   }
   dynacore::Quaternion delta_quat_body;
-  dynacore::convert(body_omega*mercury::servo_rate, delta_quat_body);
+  dynacore::convert(body_omega*valkyrie::servo_rate, delta_quat_body);
 
   dynacore::Matrix R_global_to_imu = global_ori_.normalized().toRotationMatrix();
   global_ang_vel_ = R_global_to_imu * body_omega;

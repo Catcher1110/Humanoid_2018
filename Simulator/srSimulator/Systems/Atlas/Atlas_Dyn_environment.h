@@ -24,16 +24,8 @@
 class interface;
 class srSpace;
 class Ground;
-
-struct state
-{
-  std::vector<double> conf;
-  std::vector<double> jvel;
-  std::vector<double> torque   ;
-  // std::vector<double> euler_ang;
-  double ori_mtx[9];
-  std::vector<double> ang_vel;
-};
+class Atlas_Command;
+class Atlas_SensorData;
 
 class Atlas_Dyn_environment
 {
@@ -47,8 +39,11 @@ public:
   void SetCurrentState_All();
   void saveLandingLocation();
 public:
-  interface* interface_;
-  Atlas* new_robot_;
+   Atlas_SensorData* data_;
+  Atlas_Command* cmd_;
+
+ interface* interface_;
+  Atlas* robot_;
 
   srSpace*	m_Space;
   Ground*	m_ground;

@@ -21,10 +21,10 @@ Atlas_InvKinematics::Atlas_InvKinematics(int swing_foot_id, int stance_foot_id):
     pelvis_id_ = atlas_link::pelvis;
     switch(swing_foot_id){
         case atlas_link::leftFoot:
-            swing_leg_first_jidx_ = atlas_joint::leftHipYaw;
+            swing_leg_first_jidx_ = atlas_joint::l_leg_hpz;
             break;
         case atlas_link::rightFoot:
-            swing_leg_first_jidx_ = atlas_joint::rightHipYaw;
+            swing_leg_first_jidx_ = atlas_joint::r_leg_hpz;
             break;
         case 0: // No swing leg setup case
             break;
@@ -184,12 +184,12 @@ void Atlas_InvKinematics::getDoubleSupportLegConfig(
     config_sol.segment(atlas::num_virtual, atlas::num_act_joint) 
         += delta_q.segment(atlas::num_virtual, atlas::num_act_joint);
     
-    //dynacore::pretty_print(config_sol, std::cout, "config_sol");
-    //dynacore::pretty_print(J1, std::cout, "J1");
-    //dynacore::pretty_print(J2N1, std::cout, "J2N1");
-    //dynacore::pretty_print(J2N1_pinv, std::cout, "J2N1_pinv");
-    //dynacore::pretty_print(delta_x, std::cout, "delta x");
-    //dynacore::pretty_print(delta_q, std::cout, "delta q");
+    dynacore::pretty_print(config_sol, std::cout, "config_sol");
+    dynacore::pretty_print(J1, std::cout, "J1");
+    dynacore::pretty_print(J2N1, std::cout, "J2N1");
+    dynacore::pretty_print(J2N1_pinv, std::cout, "J2N1_pinv");
+    dynacore::pretty_print(delta_x, std::cout, "delta x");
+    dynacore::pretty_print(delta_q, std::cout, "delta q");
 }
 
 void Atlas_InvKinematics::getSingleSupportStanceLegConfiguration(

@@ -5,21 +5,12 @@
 
 #include "common/utils.h"
 
-//#include <ControlSystem/Atlas/Atlas_Controller/interface.hpp>
-//#include <ControlSystem/Atlas/Atlas_Controller/StateProvider.hpp>
-#include <srTerrain/Ground.h>
+#include <DynaController/Atlas_Controller/Atlas_interface.hpp>
+#include <DynaController/Atlas_Controller/Atlas_DynaControl_Definition.h>
 #include <RobotSystems/Atlas/Atlas_Definition.h>
 
-#ifdef Measure_Time
-#include <chrono>
-using namespace std::chrono;
-#endif
-
+#include <srTerrain/Ground.h>
 #include <srConfiguration.h>
-
-// #define SENSOR_NOISE
-#define SENSOR_DELAY 0 // Sensor_delay* atlas::servo_rate (sec) = time delay
-#define ENVIRONMENT_SETUP 0
 
 Atlas_Dyn_environment::Atlas_Dyn_environment():
     ang_vel_(3)
@@ -30,13 +21,16 @@ Atlas_Dyn_environment::Atlas_Dyn_environment():
 
     m_Space->AddSystem(m_ground->BuildGround());
     /********** Robot Set  **********/
-    new_robot_ = new Atlas();
-    new_robot_->BuildRobot(Vec3 (0., 0., 0.), 
+    robot_ = new Atlas();
+    robot_->BuildRobot(Vec3 (0., 0., 0.), 
             srSystem::FIXED, srJoint::TORQUE, ModelPath"Atlas/atlas_v3_no_head.urdf");
-    m_Space->AddSystem((srSystem*)new_robot_);
+    m_Space->AddSystem((srSystem*)robot_);
 
     /******** Interface set ********/
-    //interface_ = new interface();
+    interface_ = new Atlas_interface();
+    data_ = new Atlas_SensorData();
+    cmd_ = new Atlas_Command();
+
 
     m_Space->DYN_MODE_PRESTEP();
     m_Space->SET_USER_CONTROL_FUNCTION_2(ControlFunction);
@@ -45,6 +39,10 @@ Atlas_Dyn_environment::Atlas_Dyn_environment():
 
     m_Space->SetNumberofSubstepForRendering(30);
 
+    //std::cout<<robot_->link_[robot_->link_idx_map_.find("r_foot")->second]
+        //->GetPosition()<<std::endl;;
+    //std::cout<<robot_->link_[robot_->link_idx_map_.find("l_foot")->second]
+        //->GetPosition()<<std::endl;;
     printf("[Atlas Dynamic Environment] Build Dynamic Environment\n");
 }
 
@@ -53,52 +51,61 @@ void Atlas_Dyn_environment::ControlFunction( void* _data ) {
     ++count;
 
     Atlas_Dyn_environment* pDyn_env = (Atlas_Dyn_environment*)_data;
-    Atlas* robot = (Atlas*)(pDyn_env->new_robot_);
-
-    std::vector<double> jpos(robot->num_act_joint_);
-    std::vector<double> jvel(robot->num_act_joint_);
-    std::vector<double> jtorque(robot->num_act_joint_);
-    dynacore::Vect3 pos;
-    dynacore::Quaternion rot;
-    dynacore::Vect3 body_vel;
-    dynacore::Vect3 ang_vel;
+    Atlas* robot = (Atlas*)(pDyn_env->robot_);
+    Atlas_SensorData* p_data = pDyn_env->data_;
+    
     std::vector<double> torque_command(robot->num_act_joint_);
 
     for(int i(0); i<robot->num_act_joint_; ++i){
-        jpos[i] = robot->r_joint_[i]->m_State.m_rValue[0];
-        jvel[i] = robot->r_joint_[i]->m_State.m_rValue[1];
-        jtorque[i] = robot->r_joint_[i]->m_State.m_rValue[3];
+        p_data->jpos[i] = robot->r_joint_[i]->m_State.m_rValue[0];
+        p_data->jvel[i] = robot->r_joint_[i]->m_State.m_rValue[1];
     }
-
     //pDyn_env->_CheckFootContact();
-
     for (int i(0); i<3; ++i){
-        pos[i] = robot->vp_joint_[i]->m_State.m_rValue[0];
-        body_vel[i] = robot->vp_joint_[i]->m_State.m_rValue[1];
-        ang_vel[i] = robot->link_[robot->link_idx_map_.find("pelvis")->second]->GetVel()[i];
+        p_data->imu_ang_vel[i] = 
+            robot->link_[robot->link_idx_map_.find("pelvis")->second]->GetVel()[i];
     }
-    pDyn_env->_Get_Orientation(rot);
-    //pDyn_env->interface_->GetCommand(alternate_time, jpos, jvel, jtorque, pos, rot, body_vel, ang_vel, torque_command);
+    pDyn_env->interface_->GetCommand(p_data, pDyn_env->cmd_); 
 
+    // Set Command
     for(int i(0); i<3; ++i){
         robot->vp_joint_[i]->m_State.m_rCommand = 0.0;
         robot->vr_joint_[i]->m_State.m_rCommand = 0.0;
     }
 
-    for(int i(0); i<robot->num_act_joint_; ++i){
-        robot->r_joint_[i]->m_State.m_rCommand = torque_command[i];
+    if( count < 100 ){
+        robot->vp_joint_[0]->m_State.m_rCommand = 
+            -5000. * robot->vp_joint_[0]->m_State.m_rValue[0]
+            - 10. * robot->vp_joint_[0]->m_State.m_rValue[1];
+        robot->vp_joint_[1]->m_State.m_rCommand = 
+            -5000. * robot->vp_joint_[1]->m_State.m_rValue[0]
+            - 10. * robot->vp_joint_[1]->m_State.m_rValue[1];
     }
-    // pDyn_env->_ExternalDisturbance(count);
-    //pDyn_env->_ListReactionForce();
-    //pDyn_env->_ListCommandedReactionForce(StateProvider::GetStateProvider()->Fr_);
-    //pDyn_env->_SaveStanceFoot();
+
+    double Kp(200.);
+    double Kd(5.);
+     //double Kp(30.);
+     //double Kd(0.5);
+    // Right
+    double ramp(1.);
+    if( count < 10 ){
+        ramp = ((double)count)/10.;
+    }
+    for(int i(0); i<robot->num_act_joint_; ++i){
+        robot->r_joint_[i]->m_State.m_rCommand = pDyn_env->cmd_->jtorque_cmd[i] + 
+            Kp * (pDyn_env->cmd_->jpos_cmd[i] - p_data->jpos[i]) + 
+            Kd * (pDyn_env->cmd_->jvel_cmd[i] - p_data->jvel[i]);
+        
+        //robot->r_joint_[i]->m_State.m_rCommand *= ramp;
+    }
 }
 
 
   void Atlas_Dyn_environment::Rendering_Fnc(){
   }
     void Atlas_Dyn_environment::_Get_Orientation(dynacore::Quaternion & rot){
-        SO3 so3_body =  new_robot_->link_[new_robot_->link_idx_map_.find("pelvis")->second]->GetOrientation();
+        SO3 so3_body =  robot_->
+            link_[robot_->link_idx_map_.find("pelvis")->second]->GetOrientation();
 
         Eigen::Matrix3d ori_mtx;
         for (int i(0); i<3; ++i){
@@ -112,7 +119,7 @@ void Atlas_Dyn_environment::ControlFunction( void* _data ) {
     Atlas_Dyn_environment::~Atlas_Dyn_environment()
     {
         //SR_SAFE_DELETE(interface_);
-        SR_SAFE_DELETE(new_robot_);
+        SR_SAFE_DELETE(robot_);
         SR_SAFE_DELETE(m_Space);
         SR_SAFE_DELETE(m_ground);
     }

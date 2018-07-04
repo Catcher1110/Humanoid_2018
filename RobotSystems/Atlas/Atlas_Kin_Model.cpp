@@ -354,21 +354,17 @@ unsigned int Atlas_Kin_Model::_find_body_idx(int id) const {
         case atlas_link::pelvis:
             return model_->GetBodyId("pelvis");
         case atlas_link::torso:
-            return model_->GetBodyId("torso");
-        case atlas_link::rightCOP_Frame:
-            return model_->GetBodyId("rightCOP_Frame");
-        case atlas_link::leftCOP_Frame:
-            return model_->GetBodyId("leftCOP_Frame");
+            return model_->GetBodyId("utorso");
         case atlas_link::rightFoot:
-            return model_->GetBodyId("rightFoot");
+            return model_->GetBodyId("r_foot");
         case atlas_link::leftFoot:
-            return model_->GetBodyId("leftFoot");
-        case atlas_link::rightPalm:
-            return model_->GetBodyId("rightPalm");
-        case atlas_link::leftPalm:
-            return model_->GetBodyId("leftPalm");
-        case atlas_link::head:
-            return model_->GetBodyId("head");
+            return model_->GetBodyId("l_foot");
+        case atlas_link::rightHand:
+            return model_->GetBodyId("r_hand");
+        case atlas_link::leftHand:
+            return model_->GetBodyId("l_hand");
+        //case atlas_link::head:
+            //return model_->GetBodyId("utorso");
     }
     return (unsigned int)(id+2);
 }

@@ -1,4 +1,3 @@
-SET (CTRL_SYS "Mercury")
 SET (ModelPath ${PROJECT_SOURCE_DIR}/Simulator/SimulationModel/)
 
 find_package(OpenGL REQUIRED)
@@ -23,7 +22,6 @@ add_subdirectory(srDyn)
 add_subdirectory(srg)
 add_subdirectory(common)
 add_subdirectory(LieGroup)
-#add_subdirectory(srTerrain)
 add_subdirectory(libpng)
 add_subdirectory(srSysGenerator)
 add_subdirectory(assimp)

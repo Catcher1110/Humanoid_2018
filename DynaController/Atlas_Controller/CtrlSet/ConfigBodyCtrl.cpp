@@ -104,7 +104,7 @@ void ConfigBodyCtrl::_jpos_task_setup(){
 
     //dynacore::pretty_print(Q_cur, std::cout, "Q_cur");
     //dynacore::pretty_print(config_sol, std::cout, "config_sol");
-    // Maintain initial joint position desired
+     //Maintain initial joint position desired
     jpos_task_->UpdateTask(&(pos_des), vel_des, acc_des);
     task_list_.push_back(jpos_task_);
 }

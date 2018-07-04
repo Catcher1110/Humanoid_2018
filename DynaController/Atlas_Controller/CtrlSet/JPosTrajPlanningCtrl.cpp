@@ -27,17 +27,17 @@ JPosTrajPlanningCtrl::JPosTrajPlanningCtrl(
     config_body_foot_task_ = new ConfigTask();
     if(swing_foot == atlas_link::leftFoot) {
         single_contact_ = new SingleContact(robot, atlas_link::rightFoot); 
-        swing_leg_jidx_ = atlas_joint::leftHipYaw;
-        swing_leg_roll_jidx_ = atlas_joint::leftHipRoll;
-        swing_leg_pitch_jidx_ = atlas_joint::leftHipPitch;
+        swing_leg_jidx_ = atlas_joint::l_leg_hpz;
+        swing_leg_roll_jidx_ = atlas_joint::l_leg_hpx;
+        swing_leg_pitch_jidx_ = atlas_joint::l_leg_hpy;
 
         inv_kin_ = new Atlas_InvKinematics(swing_foot, atlas_link::rightFoot);
     }
     else if(swing_foot == atlas_link::rightFoot) {
         single_contact_ = new SingleContact(robot, atlas_link::leftFoot);
-        swing_leg_jidx_ = atlas_joint::rightHipYaw;
-        swing_leg_roll_jidx_ = atlas_joint::rightHipRoll;
-        swing_leg_pitch_jidx_ = atlas_joint::rightHipPitch;
+        swing_leg_jidx_ = atlas_joint::r_leg_hpz;
+        swing_leg_roll_jidx_ = atlas_joint::r_leg_hpx;
+        swing_leg_pitch_jidx_ = atlas_joint::r_leg_hpy;
         inv_kin_ = new Atlas_InvKinematics(swing_foot, atlas_link::leftFoot);
     }
     else printf("[Warnning] swing foot is not foot: %i\n", swing_foot);

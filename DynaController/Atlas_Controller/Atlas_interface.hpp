@@ -14,7 +14,6 @@ class Atlas_interface: public interface{
 public:
   Atlas_interface();
   virtual ~Atlas_interface();
-
   virtual void GetCommand(void * data, void * command);
 
 private:

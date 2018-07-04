@@ -5,7 +5,6 @@
 #include "common/utils.h"
 
 #include <DynaController/Valkyrie_Controller/Valkyrie_interface.hpp>
-#include <DynaController/Valkyrie_Controller/Valkyrie_StateProvider.hpp>
 #include <DynaController/Valkyrie_Controller/Valkyrie_DynaControl_Definition.h>
 
 #include <srTerrain/Ground.h>
@@ -139,8 +138,6 @@ Valkyrie_Dyn_environment::~Valkyrie_Dyn_environment()
 }
 
 void Valkyrie_Dyn_environment::_CheckFootContact(bool & r_contact, bool & l_contact){
-    //Valkyrie_StateProvider::getStateProvider()->b_both_contact_ = false;
-
     Vec3 lfoot_pos = new_robot_->
         link_[new_robot_->link_idx_map_.find("leftCOP_Frame")->second]->GetPosition();
     Vec3 rfoot_pos = new_robot_->
