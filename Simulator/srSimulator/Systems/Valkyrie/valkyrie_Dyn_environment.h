@@ -40,7 +40,7 @@ public:
   Valkyrie_Command* cmd_;
 
   interface* interface_;
-  New_Valkyrie* new_robot_;
+  New_Valkyrie* robot_;
 
   srSpace*	m_Space;
   Ground*	m_ground;

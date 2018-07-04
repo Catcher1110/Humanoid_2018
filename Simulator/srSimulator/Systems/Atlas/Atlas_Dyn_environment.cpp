@@ -37,7 +37,7 @@ Atlas_Dyn_environment::Atlas_Dyn_environment():
     m_Space->SetTimestep(atlas::servo_rate);
     m_Space->SetGravity(0.0,0.0,-9.81);
 
-    m_Space->SetNumberofSubstepForRendering(1);
+    m_Space->SetNumberofSubstepForRendering(20);
 
     //std::cout<<robot_->link_[robot_->link_idx_map_.find("r_foot")->second]
         //->GetPosition()<<std::endl;;
@@ -60,7 +60,8 @@ void Atlas_Dyn_environment::ControlFunction( void* _data ) {
         p_data->jpos[i] = robot->r_joint_[i]->m_State.m_rValue[0];
         p_data->jvel[i] = robot->r_joint_[i]->m_State.m_rValue[1];
     }
-    //pDyn_env->_CheckFootContact();
+    pDyn_env->_CheckFootContact(
+            p_data->rfoot_contact, p_data->lfoot_contact);
     for (int i(0); i<3; ++i){
         p_data->imu_ang_vel[i] = 
             robot->link_[robot->link_idx_map_.find("pelvis")->second]->GetVel()[i];
@@ -124,4 +125,23 @@ void Atlas_Dyn_environment::ControlFunction( void* _data ) {
         SR_SAFE_DELETE(m_ground);
     }
 
+void Atlas_Dyn_environment::_CheckFootContact(bool & r_contact, bool & l_contact){
+    Vec3 lfoot_pos = robot_->
+        link_[robot_->link_idx_map_.find("l_foot")->second]->GetPosition();
+    Vec3 rfoot_pos = robot_->
+        link_[robot_->link_idx_map_.find("r_foot")->second]->GetPosition();
 
+    //std::cout<<rfoot_pos<<std::endl;
+    //std::cout<<lfoot_pos<<std::endl;
+
+    if(  fabs(lfoot_pos[2]) < 0.016){
+        l_contact = true;
+        //printf("left contact\n");
+    }else { l_contact = false; }
+    if (fabs(rfoot_pos[2])<0.016  ){
+        r_contact = true;
+        //printf("right contact\n");
+    } else { r_contact = false; }
+
+    //printf("\n");
+}

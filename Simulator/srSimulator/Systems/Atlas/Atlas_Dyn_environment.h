@@ -53,6 +53,7 @@ public:
 protected:
   void _Get_Orientation(dynacore::Quaternion & rot);
   void _Copy_Array(double * , double *, int);
+  void _CheckFootContact(bool & r_contact, bool & l_contact);
 };
 
 #endif

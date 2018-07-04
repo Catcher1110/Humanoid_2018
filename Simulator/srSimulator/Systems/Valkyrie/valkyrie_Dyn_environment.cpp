@@ -19,12 +19,12 @@ Valkyrie_Dyn_environment::Valkyrie_Dyn_environment()
     m_Space->AddSystem(m_ground->BuildGround());
 
     /********** Robot Set  **********/
-    new_robot_ = new New_Valkyrie();
-    //new_robot_->BuildRobot(Vec3 (0., 0., 0.), srSystem::FIXED, 
+    robot_ = new New_Valkyrie();
+    //robot_->BuildRobot(Vec3 (0., 0., 0.), srSystem::FIXED, 
     //srJoint::TORQUE, ModelPath"Valkyrie_Model/r5_urdf.urdf");
-    new_robot_->BuildRobot(Vec3 (0., 0., 0.), srSystem::FIXED, 
+    robot_->BuildRobot(Vec3 (0., 0., 0.), srSystem::FIXED, 
             srJoint::TORQUE, ModelPath"Valkyrie/valkyrie_simple.urdf");
-    m_Space->AddSystem((srSystem*)new_robot_);
+    m_Space->AddSystem((srSystem*)robot_);
 
     /******** Interface set ********/
     interface_ = new Valkyrie_interface();
@@ -46,7 +46,7 @@ void Valkyrie_Dyn_environment::ControlFunction( void* _data ) {
     ++count;
 
     Valkyrie_Dyn_environment* pDyn_env = (Valkyrie_Dyn_environment*)_data;
-    New_Valkyrie* robot = (New_Valkyrie*)(pDyn_env->new_robot_);
+    New_Valkyrie* robot = (New_Valkyrie*)(pDyn_env->robot_);
     Valkyrie_SensorData* p_data = pDyn_env->data_;
 
     //printf("num act joint: %d \n", robot->num_act_joint_);
@@ -132,16 +132,16 @@ void Valkyrie_Dyn_environment::_Copy_Array(double * subject, double * data, int 
 Valkyrie_Dyn_environment::~Valkyrie_Dyn_environment()
 {
     SR_SAFE_DELETE(interface_);
-    SR_SAFE_DELETE(new_robot_);
+    SR_SAFE_DELETE(robot_);
     SR_SAFE_DELETE(m_Space);
     SR_SAFE_DELETE(m_ground);
 }
 
 void Valkyrie_Dyn_environment::_CheckFootContact(bool & r_contact, bool & l_contact){
-    Vec3 lfoot_pos = new_robot_->
-        link_[new_robot_->link_idx_map_.find("leftCOP_Frame")->second]->GetPosition();
-    Vec3 rfoot_pos = new_robot_->
-        link_[new_robot_->link_idx_map_.find("rightCOP_Frame")->second]->GetPosition();
+    Vec3 lfoot_pos = robot_->
+        link_[robot_->link_idx_map_.find("leftCOP_Frame")->second]->GetPosition();
+    Vec3 rfoot_pos = robot_->
+        link_[robot_->link_idx_map_.find("rightCOP_Frame")->second]->GetPosition();
 
     //std::cout<<rfoot_pos<<std::endl;
     //std::cout<<lfoot_pos<<std::endl;

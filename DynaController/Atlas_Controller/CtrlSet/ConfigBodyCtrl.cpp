@@ -29,10 +29,6 @@ ConfigBodyCtrl::ConfigBodyCtrl(RobotSystem* robot):Controller(robot),
     dynacore::Vector::Constant(
         jpos_task_->getDim() + double_body_contact_->getDim(), 1000.0);
 
-    // wbdc_data_->cost_weight[0] = 10;    
-    // wbdc_data_->cost_weight[1] = 10;    
-    // wbdc_data_->cost_weight[2] = 200;    
-
     wbdc_data_->cost_weight.tail(double_body_contact_->getDim()) = 
         dynacore::Vector::Constant(double_body_contact_->getDim(), 1.);
 

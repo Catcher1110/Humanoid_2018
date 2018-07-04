@@ -29,14 +29,14 @@ TransitionConfigCtrl::TransitionConfigCtrl(RobotSystem* robot, int moving_foot, 
     wbdc_data_->cost_weight = 
         dynacore::Vector::Constant(
                 config_task_->getDim() + 
-                double_contact_->getDim(), 100.0);
+                double_contact_->getDim(), 1000.0);
 
     // wbdc_data_->cost_weight[0] = 200;    
     // wbdc_data_->cost_weight[1] = 200;    
     // wbdc_data_->cost_weight[2] = 200;    
 
     wbdc_data_->cost_weight.tail(double_contact_->getDim()) = 
-        dynacore::Vector::Constant(double_contact_->getDim(), 1000.0);
+        dynacore::Vector::Constant(double_contact_->getDim(), 1.0);
     wbdc_data_->cost_weight[config_task_->getDim() + 5]  = 0.001; // Fr_z
     wbdc_data_->cost_weight[config_task_->getDim() + 11]  = 0.001; // Fr_z
 
