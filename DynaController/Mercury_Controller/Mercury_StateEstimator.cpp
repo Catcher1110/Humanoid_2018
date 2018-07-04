@@ -3,7 +3,7 @@
 #include "Mercury_interface.hpp"
 #include <Utils/utilities.hpp>
 #include <Mercury/Mercury_Model.hpp>
-#include <Mercury/Mercury_Definition.h>
+#include "Mercury_DynaControl_Definition.h"
 #include <Filter/filters.hpp>
 
 // Mocap based Estimator
@@ -19,14 +19,9 @@
 #include <Mercury_Controller/StateEstimator/BiasCompensatedBodyVelocityEstimator.hpp>
 #include <Mercury_Controller/StateEstimator/SimpleAverageEstimator.hpp>
 
-// EKF based estimators
-#include <Mercury_Controller/StateEstimator/EKF_RotellaEstimator.hpp> // EKF
-#include <Mercury_Controller/StateEstimator/EKF_LIPRotellaEstimator.hpp> // EKF
-
 #include "MoCapManager.hpp"
 
 Mercury_StateEstimator::Mercury_StateEstimator(RobotSystem* robot):
-    base_cond_(0),
     curr_config_(mercury::num_q),
     curr_qdot_(mercury::num_qdot),
     jjpos_config_(mercury::num_q),
@@ -38,8 +33,6 @@ Mercury_StateEstimator::Mercury_StateEstimator(RobotSystem* robot):
 
     body_foot_est_ = new BodyFootPosEstimator(robot);
     ori_est_ = new BasicAccumulation();
-    //    ekf_est_ = new EKF_RotellaEstimator(); // EKF
-    //ekf_est_ = new EKF_LIPRotellaEstimator(); // EKF with Pendulum Dynamics
     bias_vel_est_ = new BiasCompensatedBodyVelocityEstimator();
     vel_est_ = new SimpleAverageEstimator();
     mocap_vel_est_ = new SimpleAverageEstimator();
@@ -96,67 +89,31 @@ void Mercury_StateEstimator::Initialization(Mercury_SensorData* data){
 
     ori_est_->EstimatorInitialization(sp_->body_ori_, imu_acc, imu_ang_vel);   
     ori_est_->getEstimatedState(sp_->body_ori_, sp_->body_ang_vel_);
-    //ekf_est_->EstimatorInitialization(sp_->body_ori_, imu_acc, imu_ang_vel); // EKF
     bias_vel_est_->EstimatorInitialization(imu_acc, sp_->body_ori_);
     body_foot_est_->Initialization(sp_->body_ori_);
 
     // Local Frame Setting
-    if(base_cond_ == base_condition::floating){
-        curr_config_[3] = sp_->body_ori_.x();
-        curr_config_[4] = sp_->body_ori_.y();
-        curr_config_[5] = sp_->body_ori_.z();
-        curr_config_[mercury::num_qdot] = sp_->body_ori_.w();
+    curr_config_[3] = sp_->body_ori_.x();
+    curr_config_[4] = sp_->body_ori_.y();
+    curr_config_[5] = sp_->body_ori_.z();
+    curr_config_[mercury::num_qdot] = sp_->body_ori_.w();
 
-        for(int i(0); i<3; ++i)
-            curr_qdot_[i+3] = sp_->body_ang_vel_[i];
+    for(int i(0); i<3; ++i)
+        curr_qdot_[i+3] = sp_->body_ang_vel_[i];
 
-        robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
+    robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
 
-        dynacore::Vect3 foot_pos, foot_vel;
-        robot_sys_->getPos(sp_->stance_foot_, foot_pos);
-        robot_sys_->getLinearVel(sp_->stance_foot_, foot_vel);
-        curr_config_[0] = -foot_pos[0];
-        curr_config_[1] = -foot_pos[1];
-        curr_config_[2] = -foot_pos[2];
-        curr_qdot_[0] = -foot_vel[0];
-        curr_qdot_[1] = -foot_vel[1];
-        curr_qdot_[2] = -foot_vel[2];
+    dynacore::Vect3 foot_pos, foot_vel;
+    robot_sys_->getPos(sp_->stance_foot_, foot_pos);
+    robot_sys_->getLinearVel(sp_->stance_foot_, foot_vel);
+    curr_config_[0] = -foot_pos[0];
+    curr_config_[1] = -foot_pos[1];
+    curr_config_[2] = -foot_pos[2];
+    curr_qdot_[0] = -foot_vel[0];
+    curr_qdot_[1] = -foot_vel[1];
+    curr_qdot_[2] = -foot_vel[2];
 
-        robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
-
-        /// Jpos based model update  ////////////////////////////////
-        if(b_jpos_model_update_){
-            jjpos_config_[3] = sp_->body_ori_.x();
-            jjpos_config_[4] = sp_->body_ori_.y();
-            jjpos_config_[5] = sp_->body_ori_.z();
-            jjpos_config_[mercury::num_qdot] = sp_->body_ori_.w();
-            for(int i(0); i<3; ++i)
-                jjvel_qdot_[i+3] = sp_->body_ang_vel_[i];
-
-            sp_->jjpos_robot_sys_->UpdateSystem(jjpos_config_, jjvel_qdot_);
-
-            sp_->jjpos_robot_sys_->getPos(sp_->stance_foot_, foot_pos);
-            sp_->jjpos_robot_sys_->getLinearVel(sp_->stance_foot_, foot_vel);
-            jjpos_config_[0] = -foot_pos[0];
-            jjpos_config_[1] = -foot_pos[1];
-            jjpos_config_[2] = -foot_pos[2];
-            jjvel_qdot_[0] = -foot_vel[0];
-            jjvel_qdot_[1] = -foot_vel[1];
-            jjvel_qdot_[2] = -foot_vel[2];
-
-            sp_->jjpos_robot_sys_->UpdateSystem(jjpos_config_, jjvel_qdot_);
-        }
-        /// END of Jpos based model update ///////////////////////////
-    } else if (base_cond_ == base_condition::fixed){
-        robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
-
-    } else if (base_cond_ == base_condition::lying){
-        // pitch rotation (PI/2)
-        curr_config_[4] = sin(M_PI/2.0/2.0);
-        curr_config_[mercury::num_qdot] = cos(M_PI/2.0/2.0);
-
-        robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
-    }
+    robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
     sp_->Q_ = curr_config_;
     sp_->Qdot_ = curr_qdot_;
 
@@ -244,96 +201,43 @@ void Mercury_StateEstimator::Update(Mercury_SensorData* data){
     bias_vel_est_->getEstimatedCoMState(sp_->com_state_imu_);
 
 
-    // Use filtered imu angular velocity data for the EKF
-    std::vector<double> filtered_imu_ang_vel(3);
-    for(int i(0); i<3; ++i){
-        filtered_imu_ang_vel[i] = filter_ang_vel_[i]->output();
-    }
-
-    // EKF set sensor data
-    //ekf_est_->setSensorData(imu_acc, imu_inc, filtered_imu_ang_vel, 
-    //data->lfoot_contact, 
-    //data->rfoot_contact,
-    //curr_config_.segment(mercury::num_virtual, mercury::num_act_joint),
-    //curr_qdot_.segment(mercury::num_virtual, mercury::num_act_joint));
-
     static bool visit_once(false);
     if ((sp_->phase_copy_ == 2) && (!visit_once)){
-        //ekf_est_->resetFilter();
         vel_est_->Initialization(sp_->CoM_vel_[0], sp_->CoM_vel_[1]);
         mocap_vel_est_->Initialization(sp_->CoM_vel_[0], sp_->CoM_vel_[1]);
         body_foot_est_->Initialization(sp_->body_ori_);
         visit_once = true;
     }
 
-    dynacore::Quaternion ekf_quaternion_est;
-    //ekf_est_->getEstimatedState(sp_->ekf_body_pos_, sp_->ekf_body_vel_, ekf_quaternion_est); // EKF    
 
-    if(base_cond_ == base_condition::floating){
-        curr_config_[3] = sp_->body_ori_.x();
-        curr_config_[4] = sp_->body_ori_.y();
-        curr_config_[5] = sp_->body_ori_.z();
-        curr_config_[mercury::num_qdot] = sp_->body_ori_.w();
+    curr_config_[3] = sp_->body_ori_.x();
+    curr_config_[4] = sp_->body_ori_.y();
+    curr_config_[5] = sp_->body_ori_.z();
+    curr_config_[mercury::num_qdot] = sp_->body_ori_.w();
 
-        for(int i(0); i<3; ++i)
-            curr_qdot_[i+3] = sp_->body_ang_vel_[i];
+    for(int i(0); i<3; ++i)
+        curr_qdot_[i+3] = sp_->body_ang_vel_[i];
 
-        //TEST
-        curr_qdot_[5] = 0.; // Yaw velocity is zero
+    //TEST
+    curr_qdot_[5] = 0.; // Yaw velocity is zero
 
 
-        robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
+    robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
 
-        // Foot position based offset
-        dynacore::Vect3 foot_pos, foot_vel;
-        robot_sys_->getPos(sp_->stance_foot_, foot_pos);
-        robot_sys_->getLinearVel(sp_->stance_foot_, foot_vel);
+    // Foot position based offset
+    dynacore::Vect3 foot_pos, foot_vel;
+    robot_sys_->getPos(sp_->stance_foot_, foot_pos);
+    robot_sys_->getLinearVel(sp_->stance_foot_, foot_vel);
 
-        curr_config_[0] = -foot_pos[0];
-        curr_config_[1] = -foot_pos[1];
-        curr_config_[2] = -foot_pos[2];
-        curr_qdot_[0] = -foot_vel[0];
-        curr_qdot_[1] = -foot_vel[1];
-        curr_qdot_[2] = -foot_vel[2];
+    curr_config_[0] = -foot_pos[0];
+    curr_config_[1] = -foot_pos[1];
+    curr_config_[2] = -foot_pos[2];
+    curr_qdot_[0] = -foot_vel[0];
+    curr_qdot_[1] = -foot_vel[1];
+    curr_qdot_[2] = -foot_vel[2];
 
-        robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
+    robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
 
-        /// Jpos based model update  ////////////////////////////////
-        if(b_jpos_model_update_){
-            jjpos_config_[3] = sp_->body_ori_.x();
-            jjpos_config_[4] = sp_->body_ori_.y();
-            jjpos_config_[5] = sp_->body_ori_.z();
-            jjpos_config_[mercury::num_qdot] = sp_->body_ori_.w();
-            for(int i(0); i<3; ++i)
-                jjvel_qdot_[i+3] = sp_->body_ang_vel_[i];
-
-            sp_->jjpos_robot_sys_->UpdateSystem(jjpos_config_, jjvel_qdot_);
-
-            sp_->jjpos_robot_sys_->getPos(sp_->stance_foot_, foot_pos);
-            sp_->jjpos_robot_sys_->getLinearVel(sp_->stance_foot_, foot_vel);
-            jjpos_config_[0] = -foot_pos[0];
-            jjpos_config_[1] = -foot_pos[1];
-            jjpos_config_[2] = -foot_pos[2];
-            jjvel_qdot_[0] = -foot_vel[0];
-            jjvel_qdot_[1] = -foot_vel[1];
-            jjvel_qdot_[2] = -foot_vel[2];
-
-            sp_->jjpos_robot_sys_->UpdateSystem(jjpos_config_, jjvel_qdot_);
-        }
-        /// END of Jpos based model update  /////////////////////////
-    } else if (base_cond_ == base_condition::fixed){
-        robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
-
-    } else if (base_cond_ == base_condition::lying){
-        // pitch rotation (PI/2)
-        curr_config_[4] = sin(M_PI/2.0/2.0);
-        curr_config_[mercury::num_qdot] = cos(M_PI/2.0/2.0);
-
-        robot_sys_->UpdateSystem(curr_config_, curr_qdot_);
-    } else {
-        printf("[Error] Incorrect base condition setup\n");
-        exit(0);
-    }
     sp_->Q_ = curr_config_;
     sp_->Qdot_ = curr_qdot_;
 

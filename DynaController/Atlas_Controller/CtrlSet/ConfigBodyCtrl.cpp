@@ -94,6 +94,7 @@ void ConfigBodyCtrl::_jpos_task_setup(){
 
     if(b_set_height_target_) body_height_cmd = target_body_height_;
     else body_height_cmd = ini_body_height_;
+    
     inv_kin_->getDoubleSupportLegConfig(Q_cur, des_quat, body_height_cmd, config_sol);
     
     for (int i(0); i<atlas::num_act_joint; ++i){
@@ -104,7 +105,8 @@ void ConfigBodyCtrl::_jpos_task_setup(){
 
     //dynacore::pretty_print(Q_cur, std::cout, "Q_cur");
     //dynacore::pretty_print(config_sol, std::cout, "config_sol");
-     //Maintain initial joint position desired
+    
+    ////Maintain initial joint position desired
     jpos_task_->UpdateTask(&(pos_des), vel_des, acc_des);
     task_list_.push_back(jpos_task_);
 }

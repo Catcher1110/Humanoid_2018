@@ -4,6 +4,7 @@
 #include <Utils/utilities.hpp>
 #include <ParamHandler/ParamHandler.hpp>
 #include "LED_Position_Announcer.hpp"
+#include <DynaController/Mercury_Controller/Mercury_DynaControl_Definition.h>
 // #define SENSOR_NOISE
 #define SENSOR_DELAY 0 // Sensor_delay* mercury::servo_rate (sec) = time delay 
 

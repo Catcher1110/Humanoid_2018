@@ -5,6 +5,7 @@
 #include "Configuration.h"
 #include <srConfiguration.h>
 #include <ParamHandler/ParamHandler.hpp>
+#include <DynaController/Mercury_Controller/Mercury_DynaControl_Definition.h>
 
 Mercury::Mercury(const  Vec3 & location, BASELINKTYPE base_link_type, srJoint::ACTTYPE joint_type):
   SystemGenerator(),

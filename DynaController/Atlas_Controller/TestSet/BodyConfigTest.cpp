@@ -1,12 +1,12 @@
 #include "BodyConfigTest.hpp"
 
-#include <Valkyrie_Controller/CtrlSet/JPosTargetCtrl.hpp>
-#include <Valkyrie_Controller/CtrlSet/ContactTransConfigCtrl.hpp>
-#include <Valkyrie_Controller/CtrlSet/ConfigBodyCtrl.hpp>
-#include <Valkyrie_Controller/Valkyrie_DynaControl_Definition.h>
+#include <Atlas_Controller/CtrlSet/JPosTargetCtrl.hpp>
+#include <Atlas_Controller/CtrlSet/ContactTransConfigCtrl.hpp>
+#include <Atlas_Controller/CtrlSet/ConfigBodyCtrl.hpp>
+#include <Atlas_Controller/Atlas_DynaControl_Definition.h>
 
 #include <ParamHandler/ParamHandler.hpp>
-#include <Valkyrie/Valkyrie_Model.hpp>
+#include <Atlas/Atlas_Model.hpp>
 
 BodyConfigTest::BodyConfigTest(RobotSystem* robot):Test(robot){
   //phase_ = BodyConfigPhase::BCJPOS_initial_jpos;
@@ -50,7 +50,7 @@ int BodyConfigTest::_NextPhase(const int & phase){
 
 
 void BodyConfigTest::_SettingParameter(){
-  ParamHandler handler(ValkyrieConfigPath"TEST_body_ctrl.yaml");
+  ParamHandler handler(AtlasConfigPath"TEST_body_ctrl.yaml");
 
   double tmp;
   std::vector<double> tmp_vec;

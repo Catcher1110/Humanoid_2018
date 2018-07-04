@@ -10,7 +10,6 @@ class Mercury_StateProvider;
 class RobotSystem;
 class filter;
 class OriEstimator;
-class EKF_PoseEstimator; // EKF estimator
 class BodyFootPosEstimator;
 class Mercury_SensorData;
 class SimpleAverageEstimator;
@@ -22,12 +21,10 @@ class Mercury_StateEstimator{
 
         void Initialization(Mercury_SensorData* );
         void Update(Mercury_SensorData* );
-        void setFloatingBase(int base_cond){ base_cond_ = base_cond; }
         void setJPosModelUpdate(bool b_enable){ b_jpos_model_update_ = b_enable; }
 
     protected:
         bool b_jpos_model_update_;
-        int base_cond_;
         double initial_height_;
         int fixed_foot_;
         dynacore::Vect3 foot_pos_;
@@ -48,7 +45,6 @@ class Mercury_StateEstimator{
         BiasCompensatedBodyVelocityEstimator* bias_vel_est_; 
         OriEstimator* ori_est_;
         BodyFootPosEstimator* body_foot_est_;
-        EKF_PoseEstimator* ekf_est_;  // EKF estimator
         SimpleAverageEstimator* vel_est_;
         SimpleAverageEstimator* mocap_vel_est_;
 

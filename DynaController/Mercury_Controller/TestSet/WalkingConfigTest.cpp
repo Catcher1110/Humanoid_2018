@@ -10,13 +10,9 @@
 #include <Utils/DataManager.hpp>
 
 #include <Mercury/Mercury_Model.hpp>
-#include <Mercury/Mercury_Definition.h>
+#include <Mercury_Controller/Mercury_DynaControl_Definition.h>
 
-#include <Mercury_Controller/CtrlSet/BodyPriorFootPlanningCtrl.hpp>
-#include <Mercury_Controller/CtrlSet/ConfigBodyFootPlanningCtrl.hpp>
-#include <Mercury_Controller/CtrlSet/BodyJPosSwingPlanningCtrl.hpp>
 #include <Mercury_Controller/CtrlSet/JPosTrajPlanningCtrl.hpp>
-#include <Mercury_Controller/CtrlSet/ConfigBodyRetractingFootPlanningCtrl.hpp>
 
 WalkingConfigTest::WalkingConfigTest(RobotSystem* robot):Test(robot),
     num_step_(0)
@@ -168,42 +164,11 @@ int WalkingConfigTest::_NextPhase(const int & phase){
         std::string tmp_str;
 
         // Swing Controller Selection
-        handler.getString("swing_ctrl_type", tmp_str);
-        if(tmp_str == "ConfigBodyFootPlanningCtrl"){
-            config_right_swing_ctrl_ = 
-                new ConfigBodyFootPlanningCtrl(robot_sys_, mercury_link::rightFoot, reversal_planner_);
-            config_left_swing_ctrl_ = 
-                new ConfigBodyFootPlanningCtrl(robot_sys_, mercury_link::leftFoot, reversal_planner_);
-            ////////////////////////////////////////////////////////////////////////////////////////////
-        }else if(tmp_str == "ConfigBodyRetractingFootPlanningCtrl"){
-            config_right_swing_ctrl_ = 
-                new ConfigBodyRetractingFootPlanningCtrl(robot_sys_, mercury_link::rightFoot, reversal_planner_);
-            config_left_swing_ctrl_ = 
-                new ConfigBodyRetractingFootPlanningCtrl(robot_sys_, mercury_link::leftFoot, reversal_planner_);
-            ////////////////////////////////////////////////////////////////////////////////////////////
-        }
-        else if(tmp_str == "BodyJPosSwingPlanningCtrl"){
-            config_right_swing_ctrl_ = 
-                new BodyJPosSwingPlanningCtrl(robot_sys_, mercury_link::rightFoot, reversal_planner_);
-            config_left_swing_ctrl_ = 
-                new BodyJPosSwingPlanningCtrl(robot_sys_, mercury_link::leftFoot, reversal_planner_);
-            ////////////////////////////////////////////////////////////////////////////////////////////
-        }else if(tmp_str == "BodyPriorFootPlanningCtrl"){
-            config_right_swing_ctrl_ = 
-                new BodyPriorFootPlanningCtrl(robot_sys_, mercury_link::rightFoot, reversal_planner_);
-            config_left_swing_ctrl_ = 
-                new BodyPriorFootPlanningCtrl(robot_sys_, mercury_link::leftFoot, reversal_planner_);
-            ////////////////////////////////////////////////////////////////////////////////////////////
-        }else if(tmp_str == "JPosTrajPlanningCtrl"){
-            config_right_swing_ctrl_ = 
-                new JPosTrajPlanningCtrl(robot_sys_, mercury_link::rightFoot, reversal_planner_);
-            config_left_swing_ctrl_ = 
-                new JPosTrajPlanningCtrl(robot_sys_, mercury_link::leftFoot, reversal_planner_);
-            ////////////////////////////////////////////////////////////////////////////////////////////
-        }else{
-            printf("[Warning] No matched planning controller\n");
-            exit(0);
-        }
+        config_right_swing_ctrl_ = 
+            new JPosTrajPlanningCtrl(robot_sys_, mercury_link::rightFoot, reversal_planner_);
+        config_left_swing_ctrl_ = 
+            new JPosTrajPlanningCtrl(robot_sys_, mercury_link::leftFoot, reversal_planner_);
+        ////////////////////////////////////////////////////////////////////////////////////////////
         // Start Phase
         handler.getInteger("start_phase", phase_);
 

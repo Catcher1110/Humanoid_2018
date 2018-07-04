@@ -21,9 +21,6 @@
 // Body Ctrl Test
 #include <Mercury_Controller/TestSet/BodyConfigTest.hpp>
 
-// Stance and Swing Test
-#include <Mercury_Controller/TestSet/ConfigStanceSwingTest.hpp>
-
 #define MEASURE_TIME 1
 #if MEASURE_TIME
 #include <chrono>
@@ -251,26 +248,12 @@ void Mercury_interface::_ParameterSetting(){
         // Body Ctrl Test ***********************************
     }else if(tmp_string == "body_ctrl_test"){
         test_ = new BodyConfigTest(robot_sys_);    
-        // Stance and Swing Test ***********************************
-    }else if(tmp_string == "config_stance_swing_test"){
-        test_ = new ConfigStanceSwingTest(robot_sys_);
     }else {
         printf("[Interfacce] There is no test matching with the name\n");
         exit(0);
     }
 
-    // State Estimator Setup
-    handler.getString("base_condition", tmp_string);
-    if(tmp_string == "floating")
-        state_estimator_->setFloatingBase(base_condition::floating);
-    else if(tmp_string == "fixed")
-        state_estimator_->setFloatingBase(base_condition::fixed);
-    else if(tmp_string == "lying")
-        state_estimator_->setFloatingBase(base_condition::lying);
-    else
-        printf("[Interface] Error: No proper base condition\n");
-
-    // Torque limit
+     // Torque limit
     handler.getVector("torque_max", torque_limit_max_);
     handler.getVector("torque_min", torque_limit_min_);
     // JPos limit

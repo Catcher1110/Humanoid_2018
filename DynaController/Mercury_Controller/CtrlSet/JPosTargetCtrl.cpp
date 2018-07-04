@@ -3,7 +3,7 @@
 #include <Mercury_Controller/TaskSet/JPosTask.hpp>
 #include <Mercury_Controller/ContactSet/FixedBodyContact.hpp>
 #include <Mercury/Mercury_Model.hpp>
-#include <Mercury/Mercury_Definition.h>
+#include <Mercury_Controller/Mercury_DynaControl_Definition.h>
 #include <WBDC_Rotor/WBDC_Rotor.hpp>
 #include <ParamHandler/ParamHandler.hpp>
 #include <Utils/utilities.hpp>
