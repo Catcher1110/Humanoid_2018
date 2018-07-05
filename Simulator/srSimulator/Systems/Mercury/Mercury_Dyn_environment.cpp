@@ -10,7 +10,7 @@
 
 
 Mercury_Dyn_environment::Mercury_Dyn_environment():
-  num_substep_rendering_(15),
+  num_substep_rendering_(5),
   count_(0)
 {
   _ParamterSetup();

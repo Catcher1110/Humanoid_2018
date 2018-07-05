@@ -210,7 +210,10 @@ void JPosTrajPlanningCtrl::_task_setup(){
             // end_jpos_traj_.getCurveDerPoint(traj_time, 1, vel);
             // end_jpos_traj_.getCurveDerPoint(traj_time, 2, acc);
         }
-    }else{
+        config_sol[swing_leg_jidx_] += roll_offset_gain_ * sp_->Q_[3];
+        config_sol[swing_leg_jidx_+ 1] += pitch_offset_gain_ * sp_->Q_[4];
+
+   }else{
         if(state_machine_time_ < half_swing_time_ * initial_traj_mix_ratio_){
             for(int i(0); i<3; ++i){
                 min_jerk_jpos_initial_[i]->getPos(state_machine_time_, pos[i]);
@@ -311,8 +314,8 @@ void JPosTrajPlanningCtrl::_Replanning(dynacore::Vect3 & target_loc){
         //com_pos[i] += body_pt_offset_[i];
         // com_vel[i] = sp_->average_vel_[i]; 
         // com_vel[i] = sp_->est_CoM_vel_[i]; 
-        com_pos[i] = sp_->est_mocap_body_pos_[i] + body_pt_offset_[i];
-        com_vel[i] = sp_->est_mocap_body_vel_[i]; 
+        //com_pos[i] = sp_->est_mocap_body_pos_[i] + body_pt_offset_[i];
+        //com_vel[i] = sp_->est_mocap_body_vel_[i]; 
         //com_vel[i] = sp_->ekf_body_vel_[i]; 
     }
 
@@ -346,7 +349,7 @@ void JPosTrajPlanningCtrl::_Replanning(dynacore::Vect3 & target_loc){
 
     if(sp_->num_step_copy_ < 2){
         // target_loc[0] = sp_->Q_[0] + default_target_loc_[0];
-        target_loc[1] = sp_->Q_[1] + default_target_loc_[1];
+        //target_loc[1] = sp_->Q_[1] + default_target_loc_[1];
     }
 
     //target_loc[2] -= push_down_height_;
@@ -561,6 +564,9 @@ void JPosTrajPlanningCtrl::CtrlInitialization(const std::string & setting_file_n
 
     // Foot landing offset
     handler.getVector("foot_landing_offset", foot_landing_offset_);
+    handler.getValue("roll_offset_gain", roll_offset_gain_);
+    handler.getValue("pitch_offset_gain", pitch_offset_gain_);
+
 
 
     static bool b_bodypute_eigenvalue(true);

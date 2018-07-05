@@ -63,7 +63,9 @@ class JPosTrajPlanningCtrl:public SwingPlanningCtrl{
         Task* config_body_foot_task_;
         void _CheckPlanning();
         void _Replanning(dynacore::Vect3 & target_loc);
-
+        double pitch_offset_gain_;
+        double roll_offset_gain_;
+ 
 
         dynacore::Vector des_jpos_;
         dynacore::Vector des_jvel_;
