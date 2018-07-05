@@ -11,10 +11,12 @@
     </inertial>
     <visual>
       <geometry>
-         <mesh filename="meshes/color_torso.dae" scale="0.001 0.001 0.001"/>
+         <!--<mesh filename="meshes/color_torso.dae" scale="0.1 0.1 0.1"/>-->
+         <!--collada file not working(no colors)-->
+         <mesh filename="meshes/color_torso.obj" scale="0.118 0.118 0.118"/>
       </geometry>
       <!--<origin rpy="0 0 1.5708" xyz="-0.165 -0.21 -0.033"/>-->
-      <origin rpy="1.67 3.075 2.55" xyz="-0.1925 -0.21 -0.0425"/>
+      <origin rpy="0 0 1.57" xyz="-0.12 0.204 -.0665"/>
     </visual>
   </link>
   <!-- IMU -->
