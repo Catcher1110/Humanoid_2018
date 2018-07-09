@@ -138,10 +138,10 @@
     </visual>  -->
     <visual>
       <geometry>
-        <mesh filename="meshes/color_foot_R.dae" scale="1 1 1"/>
+        <mesh filename="meshes/color_foot_R.obj" scale="1 1 1"/>
       </geometry>
       <!--<origin rpy="1.84159 1.3608 0.275" xyz="0.090 0.028 0.454"/>-->
-      <origin rpy="1.6 3.5 0.6" xyz="0.25 7.2675 -0.236"/>
+      <origin rpy="1.6 1.38 0" xyz="0.097 0.05 0.455"/>
     </visual>
     <collision>
       <geometry>
@@ -258,11 +258,11 @@
     </visual>  -->
     <visual>
       <geometry>
-        <mesh filename="meshes/color_foot_L.dae" scale="1 1 1"/>
+          <mesh filename="meshes/color_foot_L.obj" scale="1 1 1"/>
       </geometry>
       <!-- <origin rpy="1.5708 1.38 0" xyz="0.095 0.0698 0.450"/> -->
       <!--<origin rpy="1.84159 1.3608 0.275" xyz="0.090 0.0508 0.454"/>-->
-      <origin rpy="1.5345 3.6 0.7" xyz="-0.3175 7.266 -0.33"/>
+      <origin rpy="1.57 1.375 0" xyz="0.095 0.0565 0.4525"/>
     </visual>
     <collision>
       <geometry>
